@@ -1,62 +1,104 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import android.util.Log;
+
+import com.arcrobotics.ftclib.controller.PIDFController;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 /**
- * This is the Robot class for 2022 FTC Season
+ * This is the Robot class for 2022-2023 FTC Season
  *
  */
 public class Hardware2022 {
 
+    //This is max wheel and slide motor velocity.
     static public double ANGULAR_RATE = 2000.0;
     private final double MIN_VELOCITY = 0.1;
 
     //Adjustable parameters  here.
+    @Deprecated
     private final double CLAW_CLOSED = 1 ;
+    @Deprecated
     private final double CLAW_OPEN = 0.3 ;
-    private final double xAxisCoeff = 35.6 ;  // How many degrees encoder to turn to run an inch in X Axis
-    private final double yAxisCoeff = 22.8 ;  // How many degrees encoder to turn to run an inch in X Axis
+
+    private final double xAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in X Axis
+    private final double yAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in Y Axis
 
     //Encoder value of VSlide height in Cone mode,
-    private final int CONE_SLIDE_LOW = 0 ;
-    private final int CONE_SLIDE_MID = 1200 ;
-    private final int CONE_SLIDE_HIGH = 2500 ;
-
-    //Encoder value of VSlide height in No Cone mode
-    private final int NOCONE_SLIDE_LOW = 0 ;
-    private final int NOCONE_SLIDE_MID = 120 ;
-    private final int NOCONE_SLIDE_HIGH = 360;
-
-
+    private final int CONE_SLIDE_LOW = 1600;
+    //Get accurate reading for auto
+    private final int CONE_SLIDE_MID = 3000;
+    private final int CONE_SLIDE_HIGH = 4130;
 
     private boolean debug = true;
     private Telemetry telemetry;
+    private boolean eMode = false;
 
-    /**
-     * Robot has 2 state,  with a cone , or without a cone
-     */
-    enum RobotState {
-        HasCone,
-        NoCone
+
+    //PID control parameter for turning.
+    private double turnKP = 0.15;
+    private double turnKI = 0.1;
+    private double turnKD = 0.005;
+    private double turnKF = 0.0;
+
+    private double lnKP = 0.15;
+    private double lnKI = 0.1;
+    private double lnKD = 0.005;
+    private double lnKF = 0.0;
+
+    public double getLnKF() {
+        return lnKF;
     }
+
+    public void setLnKF(double lnKF) {
+        this.lnKF = lnKF;
+    }
+
+    public double getLnKD() {
+        return lnKD;
+    }
+
+    public void setLnKD(double lnKD) {
+        this.lnKD = lnKD;
+    }
+
+    public double getLnKI() {
+        return lnKI;
+    }
+
+    public void setLnKI(double lnKI) {
+        this.lnKI = lnKI;
+    }
+
+    public double getLnKP() {
+        return lnKP;
+    }
+
+    public void setLnKP(double lnKP) {
+        this.lnKP = lnKP;
+    }
+
+
+
+
     public enum SlideHeight {
         Low,
         Mid,
-        High
+        High,
+        Ground
     }
 
     private SlideHeight currentVSHeight = SlideHeight.Low;
-
-    //Start with no cone.
-    RobotState currentState = RobotState.NoCone;
 
     /**
      * Constructor
@@ -76,13 +118,21 @@ public class Hardware2022 {
     public DcMotorEx wheelFrontLeft = null;
     public DcMotorEx wheelBackRight = null;
     public DcMotorEx wheelBackLeft = null;
-    //public DcMotor wheelStrafe = null;
+    public DcMotorEx yEncoder = null;
+    public DcMotorEx xEncoder = null;
 
-    public DcMotor vSlide = null;
+    //Touch sensor
+    DigitalChannel clawTouch ;
 
-    public Servo grabberclaw = null;
-    public ColorSensor sensorColor = null;
-    public DistanceSensor sensorDistance = null;
+    //IMU
+    public IMU imu =null ;
+
+    public DcMotorEx vSlide = null;
+
+    //public Servo grabberclaw = null;
+    //public ColorSensor sensorColor = null;
+    //public DistanceSensor sensorDistance = null;
+    public RevTouchSensor touchSensor = null;
 
     private int vsldieInitPosition = 0;
     /**
@@ -94,17 +144,18 @@ public class Hardware2022 {
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
         wheelBackLeft = hwMap.get(DcMotorEx.class, "lrWheel");
-        vSlide = hwMap.get(DcMotor.class, "Vertical");
-
-
-        wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vSlide = hwMap.get(DcMotorEx.class, "Vertical");
+        xEncoder = hwMap.get(DcMotorEx.class, "xEncoder");
+        yEncoder = hwMap.get(DcMotorEx.class, "yEncoder");
 
 
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        vSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        vSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         wheelFrontLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -120,20 +171,36 @@ public class Hardware2022 {
         wheelBackRight.setVelocity(0);
         wheelFrontLeft.setVelocity(0);
         wheelBackLeft.setVelocity(0);
+        vSlide.setVelocity(0);
 
-        vSlide.setPower(0);
-
+        /*
         sensorColor = hwMap.get(ColorSensor.class, "clawdistance");
         sensorDistance = hwMap.get(DistanceSensor.class, "clawdistance");
 
         grabberclaw = hwMap.get(Servo.class, "grabberclaw");
+        */
+        clawTouch = hwMap.get(DigitalChannel.class, "touch");
+        clawTouch.setMode(DigitalChannel.Mode.INPUT);
+
+
+        //Get IMU.
+        imu = hwMap.get(IMU.class, "imu");
+        //Our robot mount Conrol hub Logo face backward, and USB port is facing Up.
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        // Now initialize the IMU with this mounting orientation
+        // Note: if you choose two conflicting directions, this initialization will cause a code exception.
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+
 
     }
 
     /**
      * This operation move robot forward/backward according to the input
-     * @param distance  Distance in encoder degree , 360 for a full circle.  Always positive
-     * @param power Positive value move forward
+     * @param distance  Distance in encoder degree , 360 for a full circle.  Positive for forward.
+     * @param power Positive value move forward.  Value fom 0 - 1.
      */
     private void moveYAxisDegree(int distance, double power ) {
 
@@ -142,48 +209,105 @@ public class Hardware2022 {
         wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        wheelFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wheelBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wheelFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wheelBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        wheelFrontLeft.setTargetPosition( distance  );
-        wheelBackLeft.setTargetPosition( distance  );
-        wheelFrontRight.setTargetPosition( distance  );
-        wheelBackRight.setTargetPosition( distance  );
-
-        telemetry.addLine().addData("[Y Position, after setTarget >]  ", getYAxisPosition());
-        telemetry.update();
-
-        while ( wheelFrontLeft.isBusy()) {
-            telemetry.addLine().addData("[Y Position , in the while >]  ", getYAxisPosition());
-            telemetry.addLine().addData("[Y target Position , in the while >]  ", wheelFrontLeft.getTargetPosition());
-            telemetry.update();
-
-            wheelFrontRight.setVelocity(power * Hardware2022.ANGULAR_RATE);
-            wheelFrontLeft.setVelocity(power * Hardware2022.ANGULAR_RATE);
-            wheelBackRight.setVelocity(power * Hardware2022.ANGULAR_RATE);
-            wheelBackLeft.setVelocity(power * Hardware2022.ANGULAR_RATE);
-
-        }
-
-        wheelFrontRight.setVelocity(0);
-        wheelFrontLeft.setVelocity(0);
-        wheelBackRight.setVelocity(0);
-        wheelBackLeft.setVelocity(0);
-
-
         //Put motor back into run with encoder mode.
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        int currenXPosition = xEncoder.getCurrentPosition();
+        Log.d("9010", "current X Position " + currenXPosition);
 
-    }
+        //Get current orientation.  Angle is between -180 to 180
+        int currentPosition = yEncoder.getCurrentPosition();
+        int targetPosition = currentPosition + distance;
 
-    private int getYAxisPosition( ) {
-        return  wheelFrontLeft.getCurrentPosition() ;
+        double startHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        Log.d("9010", "Start Heading " + startHeading);
+
+        Log.d("9010", "Start Position: " + currentPosition );
+        Log.d("9010", "End Position: " + targetPosition );
+
+
+        int difference = distance;
+        Log.d("9010", "Difference: " + difference );
+
+        PIDFController lnPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
+        Log.d("9010", "lnKp: " + lnKP + "  lnKI: " + lnKI + " lnKD: " + lnKD);
+        //Give X compansation more KP
+        PIDFController lnXPidfCrtler  = new PIDFController(0.2, lnKI, lnKD, lnKF);
+        Log.d("9010", "lnXKp: " + lnKP + "  lnXKI: " + lnKI + " lnXKD: " + lnKD);
+        PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
+
+
+        lnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        lnPidfCrtler.setTolerance(15);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        lnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+        lnXPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        lnXPidfCrtler.setTolerance(20);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        lnXPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+        turnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        turnPidfCrtler.setTolerance(0.5);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+        Log.d("9010", "Before entering Loop ");
+        double rx;
+        double xVelocity;
+
+        long initMill = System.currentTimeMillis();
+
+        while ( !(lnPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() )
+                && ( (System.currentTimeMillis() -initMill  )<5000)  ) {
+            currentPosition = yEncoder.getCurrentPosition();
+            //Calculate new distance
+            difference = currentPosition - targetPosition;
+            double velocityCaculated = lnPidfCrtler.calculate(difference)*4;
+            if (velocityCaculated > ANGULAR_RATE ) {
+                velocityCaculated = ANGULAR_RATE;
+            }
+            if ( velocityCaculated < -ANGULAR_RATE) {
+                velocityCaculated = -ANGULAR_RATE;
+            }
+
+            Log.d("9010", "=====================");
+            Log.d("9010", "Difference: " + difference);
+            Log.d("9010", "Current Position: " + currentPosition );
+            Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
+            double turnError = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- startHeading;
+            rx = turnPidfCrtler.calculate(turnError)*200;
+            Log.d("9010", "Turn Error: " + turnError );
+            Log.d("9010", "Calculated rx:  " + rx );
+
+            double xError = xEncoder.getCurrentPosition() - currenXPosition;
+            Log.d("9010", "X Error " + xError);
+            xVelocity = lnXPidfCrtler.calculate(xError)*7;
+            Log.d("9010", "X Vel:  " + xVelocity);
+
+
+            wheelFrontLeft.setVelocity(velocityCaculated + rx - xVelocity);
+            wheelBackLeft.setVelocity(velocityCaculated + rx+ xVelocity);
+            wheelFrontRight.setVelocity(velocityCaculated - rx + xVelocity);
+            wheelBackRight.setVelocity(velocityCaculated - rx - xVelocity);
+        }
+
+
+        //wheelFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheelFrontRight.setVelocity(0);
+        wheelFrontLeft.setVelocity(0);
+        wheelBackRight.setVelocity(0);
+        wheelBackLeft.setVelocity(0);
 
     }
 
@@ -198,8 +322,9 @@ public class Hardware2022 {
 
     /**
      * This operation move robot lef/right according to the input
-     * @param distance  Distance in encoder degree , 360 for a full circle.  Always positive
-     * @param power Positive value move right.
+     * @param distance  Distance in encoder degree , 360 for a full circle.  Positive for right.
+     * @param power Not used, calculated by PID controller. Kept for backward compatiability
+     *
      */
     private void moveXAxisDegree(int distance, double power ) {
 
@@ -208,49 +333,137 @@ public class Hardware2022 {
         wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        wheelFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wheelBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wheelFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wheelBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //Put motor back into run with encoder mode.
+        wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        wheelFrontLeft.setTargetPosition( -distance  );
-        wheelBackLeft.setTargetPosition( distance  );
-        wheelFrontRight.setTargetPosition( distance  );
-        wheelBackRight.setTargetPosition( -distance  );
+        int currentYPosition = yEncoder.getCurrentPosition();
+        Log.d("9010", "current Y Position " + currentYPosition);
 
-        telemetry.addLine().addData("[X Position, after setTarget >]  ", getYAxisPosition());
-        telemetry.update();
+        //Get current orientation.  Angle is between -180 to 180
+        int currentPosition = xEncoder.getCurrentPosition();
+        int targetPosition = currentPosition + distance;
 
-        while ( wheelFrontLeft.isBusy()) {
-            int currentPosition = getYAxisPosition();
-            double velocityCoff = 0 ;
-            if (Math.abs(currentPosition - 0 ) <= Math.abs(distance - currentPosition)) {
-                velocityCoff = (currentPosition - 0 )/(distance - 0) * 2 ;
-            } else {
-                velocityCoff = (distance - currentPosition)/(distance - 0) *2;
+        double startHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        Log.d("9010", "Start Heading " + startHeading);
+
+        Log.d("9010", "Start Position: " + currentPosition );
+        Log.d("9010", "End Position: " + targetPosition );
+
+
+        int difference = distance;
+        Log.d("9010", "Difference: " + difference );
+
+
+
+        PIDFController lnPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
+        Log.d("9010", "lnKp: " + lnKP + "  lnKI: " + lnKI + " lnKD: " + lnKD);
+        PIDFController lnYPidfCrtler  = new PIDFController(0.3, lnKI, lnKD, lnKF);
+        Log.d("9010", "lnYKp: " + lnKP + "  lnYKI: " + lnKI + " lnYKD: " + lnKD);
+        PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
+
+
+        lnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        lnPidfCrtler.setTolerance(15);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        lnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+        lnYPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        lnYPidfCrtler.setTolerance(20);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        lnYPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+        turnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        turnPidfCrtler.setTolerance(0.5);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+        Log.d("9010", "Before entering Loop ");
+        double rx;
+        double yVelocity;
+
+        long initMill = System.currentTimeMillis();
+
+        while ( ! (lnPidfCrtler.atSetPoint() && lnYPidfCrtler.atSetPoint())
+                && ( (System.currentTimeMillis() -initMill  )<5000) ) {
+            currentPosition = xEncoder.getCurrentPosition();
+            //Calculate new distance
+            difference = currentPosition - targetPosition;
+            double velocityCaculated = lnPidfCrtler.calculate(difference)*4;
+            if (velocityCaculated > ANGULAR_RATE ) {
+                velocityCaculated = ANGULAR_RATE;
             }
-            if ( velocityCoff <= MIN_VELOCITY ) {
-                velocityCoff = MIN_VELOCITY;
+            if ( velocityCaculated < -ANGULAR_RATE) {
+                velocityCaculated = -ANGULAR_RATE;
             }
 
-            telemetry.addLine().addData("[X Position , in the while >]  ", getYAxisPosition());
-            telemetry.addLine().addData("[X target Position , in the while >]  ", wheelFrontLeft.getTargetPosition());
-            telemetry.addLine().addData("[X veloCoff , in the while >]  ", velocityCoff);
+            Log.d("9010", "=====================");
+            Log.d("9010", "Difference: " + difference);
+            Log.d("9010", "Current Position: " + currentPosition );
+            Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
+            double turnError = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- startHeading;
+            rx = turnPidfCrtler.calculate(turnError)*200;
+            Log.d("9010", "Turn Error: " + turnError );
+            Log.d("9010", "Calculated rx:  " + rx );
 
-            telemetry.update();
+            double yError = yEncoder.getCurrentPosition() - currentYPosition;
+            Log.d("9010", "Y Error " + yError);
+            yVelocity = lnYPidfCrtler.calculate(yError)*7;
+            Log.d("9010", "Y Vel:  " + yVelocity);
 
-            wheelFrontLeft.setVelocity(-power * Hardware2022.ANGULAR_RATE *velocityCoff );
-            wheelBackLeft.setVelocity(power * Hardware2022.ANGULAR_RATE*velocityCoff);
-            wheelFrontRight.setVelocity(power * Hardware2022.ANGULAR_RATE*velocityCoff);
-            wheelBackRight.setVelocity(-power * Hardware2022.ANGULAR_RATE*velocityCoff);
 
+            wheelFrontLeft.setVelocity(-velocityCaculated + rx + yVelocity);
+            wheelBackLeft.setVelocity(velocityCaculated + rx+ yVelocity);
+            wheelFrontRight.setVelocity(velocityCaculated - rx+ yVelocity);
+            wheelBackRight.setVelocity(-velocityCaculated - rx+ yVelocity);
         }
 
+
+        //wheelFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         wheelFrontRight.setVelocity(0);
         wheelFrontLeft.setVelocity(0);
         wheelBackRight.setVelocity(0);
         wheelBackLeft.setVelocity(0);
+    }
 
+
+    /**
+     * This operation move robot left/right according to the input
+     * @param distance  Distance inch , positive to the right.
+     * @param power Positive value move right.
+     */
+
+    public void moveXAxis(double  distance, double power ) {
+        moveXAxisDegree((int) Math.round((float) distance * xAxisCoeff), power);
+    }
+
+    private int getXAxisPosition( ) {
+        return  wheelFrontLeft.getCurrentPosition() ;
+    }
+
+    private int getYAxisPosition( ) {
+        return  wheelFrontLeft.getCurrentPosition() ;
+    }
+
+    /**
+     * Turn robot direction.
+     *
+     * @param degree  Degrees to turn,  Positive is turn counter clock wise.
+     */
+    public void turn( double degree) {
+        wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         //Put motor back into run with encoder mode.
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -258,265 +471,230 @@ public class Hardware2022 {
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        //Get current orientation.  Angle is between -180 to 180
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        double startHeading = orientation.getYaw(AngleUnit.DEGREES);
+        double endHeading = regulateDegree( startHeading + degree );
+
+        double currentHeading = startHeading;
+
+        Log.d("9010", "Start Heading: " + startHeading );
+        Log.d("9010", "End Heading: " + endHeading );
 
 
-    }
+        double difference = regulateDegree( currentHeading - endHeading   );
+        Log.d("9010", "Difference: " + difference );
 
 
-    /**
-     * This operation move robot left/right according to the input
-     * @param distance  Distance inch ,
-     * @param power Positive value move right.
-     */
 
-    public void moveXAxis(double  distance, double power ) {
-        moveXAxisDegree((int) Math.round((float) distance * xAxisCoeff), power);
+        PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+        Log.d("9010", "Kp: " + turnKP + "  turnKI: " + turnKI + " turnKD: " + turnKD);
 
-    }
+        turnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        turnPidfCrtler.setTolerance(0.5);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
 
-    private int getXAxisPosition( ) {
-        return  wheelFrontLeft.getCurrentPosition() ;
-    }
+        Log.d("9010", "Before entering Loop ");
 
+        while ( !turnPidfCrtler.atSetPoint()  ) {
+            currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            //Calculate new distance
+            difference = regulateDegree(  currentHeading - endHeading );
+            double velocityCaculated = turnPidfCrtler.calculate(difference)/10;
 
-    /**
-     * This method checks current state of robot.
-     *
-     * @return  Enumeration of robot state.
-     */
-    RobotState checkState(){
-        return currentState;
-    }
+            Log.d("9010", "=====================");
+            Log.d("9010", "Difference: " + difference);
+            Log.d("9010", "Current Heading: " + currentHeading );
+            Log.d("9010", "Calculated Volocity:  " + velocityCaculated );
 
-
-    /**
-     * This method to check if there is a cone close to the claw,
-     * If so, close the claw, and change current stats to has Cone.
-     *
-     */
-    public void checkAndGrabCone ( ) {
-
-        //Only try to grab cone if in No Cone state.
-        if ( currentState.equals(RobotState.NoCone)){
-            if ( debug) {
-                telemetry.addLine().addData("[>]  ", "No cone, checking cone.");
-                telemetry.update();
-            }
-
-            // Check if there is a cone close by, if so close claw
-            if (sensorDistance.getDistance(DistanceUnit.CM) < 2) {
-                if (debug) {
-                    telemetry.addLine().addData("[>]  ", "Found cone,close claw.");
-                    telemetry.update();
-                }
-                grabberclaw.setPosition(CLAW_CLOSED);
-                currentState = RobotState.HasCone;
-            }
-
+            wheelFrontLeft.setVelocity(velocityCaculated * Hardware2022.ANGULAR_RATE);
+            wheelBackLeft.setVelocity(velocityCaculated * Hardware2022.ANGULAR_RATE);
+            wheelFrontRight.setVelocity(-velocityCaculated * Hardware2022.ANGULAR_RATE);
+            wheelBackRight.setVelocity(-velocityCaculated * Hardware2022.ANGULAR_RATE);
         }
+
+
+        //wheelFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //wheelBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wheelFrontRight.setVelocity(0);
+        wheelFrontLeft.setVelocity(0);
+        wheelBackRight.setVelocity(0);
+        wheelBackLeft.setVelocity(0);
     }
+
+    /**
+     * Regulate degreee between -180 and 180, by adding or substracting 360.
+     *
+     * @param degree
+     * @return
+     */
+    private double regulateDegree ( double degree ) {
+       if ( degree > 180) {
+           degree -= 360;
+       } else if ( degree < -180 ) {
+           degree += 360;
+       }
+
+       return degree;
+    }
+
 
     private int getVSlidePosition () {
         return vSlide.getCurrentPosition() - vsldieInitPosition;
     }
 
-    /**
-     *  This operation to raise Vertical Slide to one level higher
-     */
-    public void raiseVerticalSlide (  ) {
-        telemetry.addLine().addData("[ >]  ", "Slide Raising, current high  " + currentVSHeight);
-        telemetry.update();
-
-        switch ( currentVSHeight) {
-            case Low: {
-                if (currentState.equals(RobotState.HasCone)) {
-                    while (getVSlidePosition() < CONE_SLIDE_MID) {
-                        vSlide.setPower(1);
-                    }
-                } else if (currentState.equals(RobotState.NoCone)) {
-                    while (getVSlidePosition() < NOCONE_SLIDE_MID) {
-                        vSlide.setPower(1);
-                    }
-                }
-            }
-                break;
-
-            case Mid: {
-
-                if (currentState.equals(RobotState.HasCone)) {
-                    while (getVSlidePosition() < CONE_SLIDE_HIGH) {
-                        vSlide.setPower(1);
-                    }
-                } else if (currentState.equals(RobotState.NoCone)) {
-                    while (getVSlidePosition() < NOCONE_SLIDE_HIGH); {
-                        vSlide.setPower(1);
-                    }
-                }
-                break;
-            }
-
-            case High: {
-                //DO noting, already highest
-
-            }
-        }
-
-
-    }
-
-    /**
-     * This operation to lower vertical Slide to one level lower.
-     */
-    public void lowerVerticalSlide () {
-
-        switch ( currentVSHeight) {
-            case Low: {
-                //DO nothing, already lowest.
-                break;
-            }
-
-            case Mid: {
-                if (currentState.equals(RobotState.HasCone)) {
-                    while (getVSlidePosition() > CONE_SLIDE_LOW) {
-                        vSlide.setPower(-1);
-                    }
-                } else if (currentState.equals(RobotState.NoCone)) {
-                    while (getVSlidePosition() > NOCONE_SLIDE_LOW) {
-                        vSlide.setPower(-1);
-                    }
-                }
-                break;
-            }
-
-            case High: {
-                if (currentState.equals(RobotState.HasCone)) {
-                    while (getVSlidePosition() > CONE_SLIDE_MID) {
-                        vSlide.setPower(-1);
-                    }
-                } else if (currentState.equals(RobotState.NoCone)) {
-                    while (getVSlidePosition() > NOCONE_SLIDE_MID) {
-                        vSlide.setPower(-1);
-                    }
-
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Lower vertical Slide freely , using game control
-     * @param power, Expect positive input
-    public void freeLowerVerticalSlide( float power ) {
-        telemetry.addLine().addData("Encoder Reading", vSlide.getCurrentPosition() );
-        telemetry.update();
-
-        if (vSlide.getCurrentPosition() > CONE_SLIDE_LOW ) {
-            vSlide.setPower( -power );
-        }
-        else {
-            vSlide.setPower ( 0 );
-        }
-
-    }
-     */
 
     /**
      * Move vertical Slide freely , using game control
      * @param power
      */
     public void freeMoveVerticalSlide(float power ) {
-        //telemetry.addLine().addData("Encoder Reading", vSlide.getCurrentPosition() );
-        //telemetry.addLine().addData("pwer input", power );
-
+        /*
+        telemetry.addLine().addData("Encoder Reading", vSlide.getCurrentPosition() );
+        telemetry.addLine().addData("pwer input", power );
         telemetry.update();
 
-        if ( ( (vSlide.getCurrentPosition() - vsldieInitPosition)  <= CONE_SLIDE_HIGH
-                && power > 0 )
-               ||  ( (vSlide.getCurrentPosition() - vsldieInitPosition)  >= 0 )
-                && power < 0 )
-        {
-            //telemetry.addLine().addData("We have power!", power );
-            //telemetry.update();
-            vSlide.setPower( power );
-            //Thread.sleep(100);
-        } else {
-            vSlide.setPower( 0 );
+         */
+
+        if ( power != 0 ) {
+            Log.d("9010", "vSlide position " + vSlide.getCurrentPosition());
         }
 
+        if ( ( (vSlide.getCurrentPosition() - vsldieInitPosition)  <= CONE_SLIDE_HIGH && power > 0 )
+                ||  ( (vSlide.getCurrentPosition() - vsldieInitPosition)  >= 0  && power < 0 ) ||  eMode ) {
+            //telemetry.addLine().addData("We have power!", power );
+            //telemetry.update();
+            //Only give power when moving up, or moving down,but touch is not pushed.
+            if (power > 0 || (power < 0 && clawTouch.getState() == true)) {
+                vSlide.setVelocity(power * ANGULAR_RATE);
+            }
+
+            else {
+                vSlide.setVelocity(0);
+            }
+        } else {
+            vSlide.setVelocity(0);
+        }
+        //Thread.sleep(100);
+
     }
-
-
-    public void  releaseCone( ){
-        telemetry.addLine().addData("Release", CLAW_OPEN );
-        telemetry.update();
-
-        grabberclaw.setPosition(CLAW_OPEN);
-        currentState = RobotState.NoCone;
-
-
-    }
-
 
 
     public void goToHeight ( SlideHeight height ) {
         int targetPosition = 0;
 
-        if (currentState.equals(RobotState.HasCone)) {
-            if (height.equals(SlideHeight.Low)) {
-                targetPosition = CONE_SLIDE_LOW;
-
-            }
-            if (height.equals(SlideHeight.Mid)) {
-                targetPosition = CONE_SLIDE_MID;
-            }
-            if (height.equals(SlideHeight.High)) {
-                targetPosition = CONE_SLIDE_HIGH;
-            }
-
-        } else if (currentState.equals(RobotState.NoCone)) {
-            if (height.equals(SlideHeight.Low)) {
-                targetPosition = NOCONE_SLIDE_LOW;
-            }
-            if (height.equals(SlideHeight.Mid)) {
-                targetPosition = NOCONE_SLIDE_MID;
-            }
-            if (height.equals(SlideHeight.High)) {
-                targetPosition = NOCONE_SLIDE_HIGH;
-            }
-
+        if (height.equals(SlideHeight.Low)) {
+            targetPosition = CONE_SLIDE_LOW;
+        }
+        if (height.equals(SlideHeight.Mid)) {
+            targetPosition = CONE_SLIDE_MID;
+        }
+        if (height.equals(SlideHeight.High)) {
+            targetPosition = CONE_SLIDE_HIGH;
+        }
+        if (height.equals(SlideHeight.Ground)) {
+            targetPosition = vsldieInitPosition;
         }
 
         //Move the slide
         int currentPosition = vSlide.getCurrentPosition();
+        Log.d("9010", "vSlide position before Move: " + vSlide.getCurrentPosition());
+
+        vSlide.setTargetPosition(targetPosition);
+        Log.d("9010", "Target position : " + targetPosition);
+        vSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int sign = 1;
 
         if ((currentPosition - targetPosition) > 0 ) {
-            //Lower slide
-            while (vSlide.getCurrentPosition() > targetPosition ) {
-                vSlide.setPower(-1);
-            }
+            sign= -1;
         } else {
             //raise slide
-            while (vSlide.getCurrentPosition() < targetPosition ) {
-                vSlide.setPower(1);
-            }
-
+            sign = 1;
         }
+
+        while (vSlide.isBusy()) {
+            vSlide.setVelocity( sign * ANGULAR_RATE* 0.5 );
+            //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
+        }
+        vSlide.setVelocity(0);
+        Log.d("9010", "after Moving Loop : " + vSlide.getCurrentPosition());
         currentVSHeight = height;
-
-
-    }
-
-    public void manualgrab() {
-        telemetry.addLine().addData("Manaul Grap", CLAW_CLOSED );
-        telemetry.update();
-
-        grabberclaw.setPosition(CLAW_CLOSED);
-        currentState = RobotState.HasCone;
-
+        //Set mode back to Run using encoder.
+        vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 
+    public double getTurnKP() {
+        return turnKP;
+    }
 
+    public void setTurnKP(double turnKP) {
+        this.turnKP = turnKP;
+    }
 
+    public double getTurnKI() {
+        return turnKI;
+    }
+
+    public void setTurnKI(double turnKI) {
+        this.turnKI = turnKI;
+    }
+
+    public double getTurnKD() {
+        return turnKD;
+    }
+
+    public void setTurnKD(double turnKD) {
+        this.turnKD = turnKD;
+    }
+
+    public double getTurnKF() {
+        return turnKF;
+    }
+
+    public void setTurnKF(double turnKF) {
+        this.turnKF = turnKF;
+    }
+    /*This method will lower slide until touch sensor gets activated
+     */
+    public void dropCone() {
+
+        double power = -0.5;
+        double slideStartPostion = vSlide.getCurrentPosition();
+        double travel = slideStartPostion - vSlide.getCurrentPosition();
+        Log.d("9010", "slideStartPostion:  " + slideStartPostion);
+        Log.d("9010", "Travel:  " + travel);
+
+        while (clawTouch.getState()==true && ( travel < 1200 )) {
+            vSlide.setVelocity(power * ANGULAR_RATE);
+            travel = slideStartPostion - vSlide.getCurrentPosition();
+            //Log.d("9010", "postion:  " + vSlide.getCurrentPosition());
+            //Log.d("9010", "Travel:  " + travel);
+        }
+
+        Log.d("9010", "After SLide Drop Cone ");
+        vSlide.setVelocity(0);
+
+        //Thread.sleep(100);
+
+    }
+
+    public void seteMode ( boolean input ) {
+        Log.d("9010", "eMode is set to: " + input );
+        if (input) {
+            this.eMode = input;
+        } else {
+            this.eMode = input;
+            this.vsldieInitPosition = vSlide.getCurrentPosition();
+            Log.d("9010", "Now new vslide init position: " + vsldieInitPosition);
+        }
+    }
+
+    public boolean iseMode() {
+        return eMode;
+    }
 }
