@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.PtzControl;
-import org.firstinspires.ftc.teamcode.hardware.ConeImageProcessor;
 import org.firstinspires.ftc.teamcode.hardware.ConeQRProcessor;
 import org.firstinspires.ftc.teamcode.hardware.SleeveSide;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -14,9 +13,6 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-//import com.qualcomm.robotcore.hardware;
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware2022;

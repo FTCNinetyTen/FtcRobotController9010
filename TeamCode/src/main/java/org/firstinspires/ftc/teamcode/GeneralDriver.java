@@ -2,14 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels;
 
 @TeleOp(name="GeneralDriver2022", group="TeleOps")
-public class GeneralDriver extends BaseTele {
+public class GeneralDriver extends LinearOpMode {
 
     private boolean debug = true;
     Hardware2022 hdw;
