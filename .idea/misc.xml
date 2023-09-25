@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/git_local/FTC9010/FtcRobotController/src/main/res/layout/activity_ftc_controller.xml" value="0.2015625" />
+        <entry key="..\:/git_local/FTC9010/FtcRobotController/src/main/res/menu/ftc_robot_controller.xml" value="0.2015625" />
+      </map>
+    </option>
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../../../../FTC Code/JavaDOc" />
