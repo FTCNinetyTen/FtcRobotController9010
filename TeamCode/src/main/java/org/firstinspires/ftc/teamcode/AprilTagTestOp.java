@@ -119,7 +119,7 @@ public class AprilTagTestOp extends LinearOpMode {
             // == CAMERA CALIBRATION ==
             // If you do not manually specify calibration parameters, the SDK will attempt
             // to load a predefined calibration for your camera.
-            //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
+            .setLensIntrinsics(1516.76, 1516.76, 950.833, 533.379)
 
             // ... these parameters are fx, fy, cx, cy.
 
@@ -127,7 +127,7 @@ public class AprilTagTestOp extends LinearOpMode {
 
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder()
-                .setCameraResolution(new Size(1280,720));
+                .setCameraResolution(new Size(1920,1080));
 
         // Set the camera (webcam vs. built-in RC phone camera).
         if (USE_WEBCAM) {
