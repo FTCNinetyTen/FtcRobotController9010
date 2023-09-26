@@ -182,7 +182,7 @@ public class Hardware2023 {
     /**
      * Initialize the AprilTag processor.
      */
-    private void initAprilTag() {
+    public  void initAprilTag() {
 
         // Create the AprilTag processor.
         aprilTagProc = new AprilTagProcessor.Builder()
@@ -568,11 +568,11 @@ public class Hardware2023 {
      * april tag
      *
      * @param tagId    Id of the tag to be used for reference.
-     * @param yDiff   distance of robot to the april tag,  unit in inches.
-     * @param xDiff  horizontal shift to the center of april tag.  unit in inces
+     * @param targetY   distance of robot to the april tag,  unit in inches.
+     * @param targetX   horizontal shift to the center of april tag.  unit in inces
      * @param power    move with power, range 0 - 1
      */
-    public void moveByAprilTag( int tagId,  double yDiff  ,  double xDiff ,  double power  ) {
+    public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) {
 
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -588,32 +588,30 @@ public class Hardware2023 {
         //Start April Tag detection fo find tag
         List<AprilTagDetection> currentDetections = aprilTagProc.getDetections();
         if (currentDetections.size()<1 ) {
+            //No tag found, do nothing.
             telemetry.addData("No AprilTags Detected", currentDetections.size());
+            Log.d("9010", "No AprilTags Detected"  + tagId );
             return;
         } else {
+            //Loop though tags found
             for ( AprilTagDetection detection : currentDetections) {
                 if ( detection.id == tagId) {
                     //Here we found our target April Tag.
-
-                    double currenXDiff = detection.ftcPose.x;
-                    Log.d("9010", "current X Diff " + currenXDiff);
-
-                    double currenYDiff = detection.ftcPose.y;
-                    Log.d("9010", "current Y Diff " + currenYDiff);
-
+                    //Get Error
+                    double currenX = detection.ftcPose.x;
+                    Log.d("9010", "current X Diff " + currenX);
+                    double currenY = detection.ftcPose.y;
+                    Log.d("9010", "current Y Diff " + currenX);
                     double currentYaw = detection.ftcPose.yaw;
                     Log.d("9010", "current Yaw " + currentYaw);
 
-
+                    //Initialize PID controller for X, Y and turn
                     PIDFController lnYPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
                     Log.d("9010", "Y Kp: " + lnKP + "  KI: " + lnKI + " KD: " + lnKD);
-                    //Give X compansation more KP
                     PIDFController lnXPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
                     Log.d("9010", "X Kp: " + lnKP + "  KI: " + lnKI + " KD: " + lnKD);
-
                     PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
                     Log.d("9010", "turn Kp: " + turnKP + "  KI: " + turnKI + " KD: " + turnKD);
-
 
                     lnYPidfCrtler.setSetPoint(0);
                     //Set tolerance as 0.5 degrees
@@ -633,62 +631,68 @@ public class Hardware2023 {
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
 
+                    double xError =0 ;
+                    double yError =0;
+                    double rx = 0;
+
                     Log.d("9010", "Before entering Loop ");
-                    double rx;
-                    double xVelocity;
-
                     long initMill = System.currentTimeMillis();
-
                     while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )
                             && ( (System.currentTimeMillis() -initMill  )<3000)  ) {
 
-                        currenXDiff=currenXDiff = detection.ftcPose.x;
+                        //Calculate X, Y and turn by the april tag input
+                        xError = detection.ftcPose.x - targetX  ;
 
-                        double xVelocityCaculated = lnXPidfCrtler.calculate(currenXDiff)*4;
+                        double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff;
                         if (xVelocityCaculated > ANGULAR_RATE ) {
                             xVelocityCaculated = ANGULAR_RATE;
                         }
                         if ( xVelocityCaculated < -ANGULAR_RATE) {
                             xVelocityCaculated = -ANGULAR_RATE;
                         }
+                        Log.d("9010", "===================================" );
+                        Log.d("9010", "x  Error: " + xError );
+                        Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
 
-                        currenYDiff = detection.ftcPose.x;
-                        double yVelocityCaculated = lnYPidfCrtler.calculate(currenYDiff)*4;
+                        yError = detection.ftcPose.y - targetY ;
+                        double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff;
+                        if (yVelocityCaculated > ANGULAR_RATE ) {
+                            yVelocityCaculated = ANGULAR_RATE;
+                        }
+                        if ( yVelocityCaculated < -ANGULAR_RATE) {
+                            yVelocityCaculated = -ANGULAR_RATE;
+                        }
 
-                        Log.d("9010", "Calculated xVelocityCaculated:  " + xVelocityCaculated );
+                        Log.d("9010", "Y  Error: " + yError );
+                        Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
+
+                        //Target Yaw is 0
                         double turnError =detection.ftcPose.yaw;
                         rx = turnPidfCrtler.calculate(turnError)*200;
+
+
                         Log.d("9010", "Turn Error: " + turnError );
                         Log.d("9010", "Calculated rx:  " + rx );
-
 
 
                         wheelFrontLeft.setVelocity(yVelocityCaculated + rx - xVelocityCaculated);
                         wheelBackLeft.setVelocity(yVelocityCaculated + rx+ xVelocityCaculated);
                         wheelFrontRight.setVelocity(yVelocityCaculated - rx + xVelocityCaculated);
                         wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
-                    }
+                    } // while loop
 
-
+                    Log.d("9010", "After PID Loop ");
                     wheelFrontRight.setVelocity(0);
                     wheelFrontLeft.setVelocity(0);
                     wheelBackRight.setVelocity(0);
                     wheelBackLeft.setVelocity(0);
-
-
-
-
-                }
-            }
+                } // if ( detection.id == tagId) {
+            } // for ( AprilTagDetection detection : currentDetections) {
 
             telemetry.addData("Targeted AprilTags Not Detected", tagId);
-        }
+            Log.d("9010", "Targeted AprilTags Not Detected"  + tagId );
+        } //End of  if (currentDetections.size()<1 )   {  } else
 
 
-
-
-
-
-
-    }
+    } // End of public void moveByAprilTag
 }

@@ -2,12 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
+import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
 
 @TeleOp(name="HDWTestOp", group="TeleOps")
 public class HWTestTele  extends LinearOpMode {
-    Hardware2022 hdw;
+    Hardware2023 hdw;
 
     double[] pidCoffs = { 0.2,0.2,0.0 };
     int pidCoffIndex = 0;
@@ -15,11 +14,12 @@ public class HWTestTele  extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        hdw = new Hardware2022(hardwareMap, telemetry); //init hardware
+        hdw = new Hardware2023(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
+        hdw.initAprilTag();
 
         waitForStart();
         telemetry.clearAll();
@@ -37,7 +37,6 @@ public class HWTestTele  extends LinearOpMode {
             if (gamepad1.dpad_up) {
                 telemetry.addLine().addData("[moving y >]  ", " Y ");
                 telemetry.update();
-
                 hdw.moveYAxis(10.0, .5);
             }
             if (gamepad1.dpad_down) {
@@ -104,15 +103,10 @@ public class HWTestTele  extends LinearOpMode {
                 sleep(100);
             }
 
-
             if (gamepad1.left_stick_button) {
-                hdw.goToHeight(Hardware2022.SlideHeight.Mid);
+                hdw.moveByAprilTag(4 , 12, -1);
             }
 
-
-            /*if (gamepad1.circle) {
-                hdw.coneDropStop();
-            */
 
         }
     }
