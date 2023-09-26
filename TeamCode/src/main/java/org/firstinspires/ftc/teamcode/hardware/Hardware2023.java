@@ -16,7 +16,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
 
 /**
  * This is the Robot class for 2022-2023 FTC Season
@@ -565,11 +568,126 @@ public class Hardware2023 {
      * april tag
      *
      * @param tagId    Id of the tag to be used for reference.
-     * @param range   distance of robot to the april tag,  unit in inches.
-     * @param shifting  horizontal shift to the center of april tag.  unit in inces
+     * @param yDiff   distance of robot to the april tag,  unit in inches.
+     * @param xDiff  horizontal shift to the center of april tag.  unit in inces
      * @param power    move with power, range 0 - 1
      */
-    public void moveByAprilTag( int tagId,  double range  ,  double shifting ,  double power  ) {
+    public void moveByAprilTag( int tagId,  double yDiff  ,  double xDiff ,  double power  ) {
+
+        wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //Put motor back into run with encoder mode.
+        wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //Start April Tag detection fo find tag
+        List<AprilTagDetection> currentDetections = aprilTagProc.getDetections();
+        if (currentDetections.size()<1 ) {
+            telemetry.addData("No AprilTags Detected", currentDetections.size());
+            return;
+        } else {
+            for ( AprilTagDetection detection : currentDetections) {
+                if ( detection.id == tagId) {
+                    //Here we found our target April Tag.
+
+                    double currenXDiff = detection.ftcPose.x;
+                    Log.d("9010", "current X Diff " + currenXDiff);
+
+                    double currenYDiff = detection.ftcPose.y;
+                    Log.d("9010", "current Y Diff " + currenYDiff);
+
+                    double currentYaw = detection.ftcPose.yaw;
+                    Log.d("9010", "current Yaw " + currentYaw);
+
+
+                    PIDFController lnYPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
+                    Log.d("9010", "Y Kp: " + lnKP + "  KI: " + lnKI + " KD: " + lnKD);
+                    //Give X compansation more KP
+                    PIDFController lnXPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
+                    Log.d("9010", "X Kp: " + lnKP + "  KI: " + lnKI + " KD: " + lnKD);
+
+                    PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+                    Log.d("9010", "turn Kp: " + turnKP + "  KI: " + turnKI + " KD: " + turnKD);
+
+
+                    lnYPidfCrtler.setSetPoint(0);
+                    //Set tolerance as 0.5 degrees
+                    lnYPidfCrtler.setTolerance(0.2);
+                    //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+                    lnYPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+                    lnXPidfCrtler.setSetPoint(0);
+                    //Set tolerance as 0.5 degrees
+                    lnXPidfCrtler.setTolerance(0.2);
+                    //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+                    lnXPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+                    turnPidfCrtler.setSetPoint(0);
+                    //Set tolerance as 0.5 degrees
+                    turnPidfCrtler.setTolerance(0.5);
+                    //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+                    turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+
+                    Log.d("9010", "Before entering Loop ");
+                    double rx;
+                    double xVelocity;
+
+                    long initMill = System.currentTimeMillis();
+
+                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )
+                            && ( (System.currentTimeMillis() -initMill  )<3000)  ) {
+
+                        currenXDiff=currenXDiff = detection.ftcPose.x;
+
+                        double xVelocityCaculated = lnXPidfCrtler.calculate(currenXDiff)*4;
+                        if (xVelocityCaculated > ANGULAR_RATE ) {
+                            xVelocityCaculated = ANGULAR_RATE;
+                        }
+                        if ( xVelocityCaculated < -ANGULAR_RATE) {
+                            xVelocityCaculated = -ANGULAR_RATE;
+                        }
+
+                        currenYDiff = detection.ftcPose.x;
+                        double yVelocityCaculated = lnYPidfCrtler.calculate(currenYDiff)*4;
+
+                        Log.d("9010", "Calculated xVelocityCaculated:  " + xVelocityCaculated );
+                        double turnError =detection.ftcPose.yaw;
+                        rx = turnPidfCrtler.calculate(turnError)*200;
+                        Log.d("9010", "Turn Error: " + turnError );
+                        Log.d("9010", "Calculated rx:  " + rx );
+
+
+
+                        wheelFrontLeft.setVelocity(yVelocityCaculated + rx - xVelocityCaculated);
+                        wheelBackLeft.setVelocity(yVelocityCaculated + rx+ xVelocityCaculated);
+                        wheelFrontRight.setVelocity(yVelocityCaculated - rx + xVelocityCaculated);
+                        wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
+                    }
+
+
+                    wheelFrontRight.setVelocity(0);
+                    wheelFrontLeft.setVelocity(0);
+                    wheelBackRight.setVelocity(0);
+                    wheelBackLeft.setVelocity(0);
+
+
+
+
+                }
+            }
+
+            telemetry.addData("Targeted AprilTags Not Detected", tagId);
+        }
+
+
+
+
+
 
 
     }
