@@ -703,11 +703,7 @@ public class Hardware2023 {
                     wheelBackLeft.setVelocity(0);
                 } // if ( detection.id == tagId) {
             } // for ( AprilTagDetection detection : currentDetections) {
-
-            telemetry.addData("Targeted AprilTags Not Detected", tagId);
-            Log.d("9010", "Targeted AprilTags Not Detected"  + tagId );
         } //End of  if (currentDetections.size()<1 )   {  } else
-
 
     } // End of public void moveByAprilTag
 }
