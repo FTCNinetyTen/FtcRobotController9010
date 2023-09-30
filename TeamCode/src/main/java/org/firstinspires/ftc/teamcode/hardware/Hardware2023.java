@@ -647,7 +647,7 @@ public class Hardware2023 {
                                 Log.d("9010", "===================================" );
                                 Log.d("9010" , "Find new detection for Tag: " + tagId);
                                 //Calculate X, Y and turn by the april tag input
-                                xError =  targetX - loopDetetion.ftcPose.x;
+                                xError =  loopDetetion.ftcPose.x - targetX ;
 
                                 double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff/5;
                                 if (xVelocityCaculated > ANGULAR_RATE ) {
@@ -661,7 +661,7 @@ public class Hardware2023 {
                                 Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
 
                                 yError =  loopDetetion.ftcPose.y - targetY;
-                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff/3;
+                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff/2;
                                 if (yVelocityCaculated > ANGULAR_RATE ) {
                                     yVelocityCaculated = ANGULAR_RATE;
                                 }
@@ -673,12 +673,11 @@ public class Hardware2023 {
                                 Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
 
                                 //Target Yaw is 0
-                                double turnError = - loopDetetion.ftcPose.yaw;
-                                rx = turnPidfCrtler.calculate(turnError)*50;
+                                double turnError =  loopDetetion.ftcPose.yaw;
+                                rx = turnPidfCrtler.calculate(turnError)*20;
 
                                 Log.d("9010", "Turn Error: " + turnError );
                                 Log.d("9010", "Calculated rx:  " + rx );
-
 
                                 wheelFrontLeft.setVelocity(yVelocityCaculated + rx - xVelocityCaculated);
                                 wheelBackLeft.setVelocity(yVelocityCaculated + rx+ xVelocityCaculated);
