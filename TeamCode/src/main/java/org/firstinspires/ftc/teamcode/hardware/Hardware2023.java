@@ -570,7 +570,6 @@ public class Hardware2023 {
      * @param tagId    Id of the tag to be used for reference.
      * @param targetY   distance of robot to the april tag,  unit in inches.
      * @param targetX   horizontal shift to the center of april tag.  unit in inces
-     * @param power    move with power, range 0 - 1
      */
     public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) {
 
@@ -599,9 +598,9 @@ public class Hardware2023 {
                     //Here we found our target April Tag.
                     //Get Error
                     double currenX = detection.ftcPose.x;
-                    Log.d("9010", "current X Diff " + currenX);
+                    Log.d("9010", "current X " + currenX);
                     double currenY = detection.ftcPose.y;
-                    Log.d("9010", "current Y Diff " + currenX);
+                    Log.d("9010", "current Y  " + currenY);
                     double currentYaw = detection.ftcPose.yaw;
                     Log.d("9010", "current Yaw " + currentYaw);
 
@@ -638,47 +637,63 @@ public class Hardware2023 {
                     Log.d("9010", "Before entering Loop ");
                     long initMill = System.currentTimeMillis();
                     while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )
-                            && ( (System.currentTimeMillis() -initMill  )<3000)  ) {
+                            && ( (System.currentTimeMillis() -initMill  )<5000)  ) {
 
-                        //Calculate X, Y and turn by the april tag input
-                        xError = detection.ftcPose.x - targetX  ;
+                        //Get new april tag  detection
+                        List<AprilTagDetection> loopDetections = aprilTagProc.getDetections();
+                        boolean newDetectionFound = false;
+                        for (AprilTagDetection loopDetetion : loopDetections) {
+                            if ( loopDetetion.id == tagId) {
+                                Log.d("9010", "===================================" );
+                                Log.d("9010" , "Find new detection for Tag: " + tagId);
+                                //Calculate X, Y and turn by the april tag input
+                                xError =  targetX - loopDetetion.ftcPose.x;
 
-                        double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff;
-                        if (xVelocityCaculated > ANGULAR_RATE ) {
-                            xVelocityCaculated = ANGULAR_RATE;
+                                double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff/5;
+                                if (xVelocityCaculated > ANGULAR_RATE ) {
+                                    xVelocityCaculated = ANGULAR_RATE;
+                                }
+                                if ( xVelocityCaculated < -ANGULAR_RATE) {
+                                    xVelocityCaculated = -ANGULAR_RATE;
+                                }
+
+                                Log.d("9010", "x  Error: " + xError );
+                                Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
+
+                                yError =  loopDetetion.ftcPose.y - targetY;
+                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff/3;
+                                if (yVelocityCaculated > ANGULAR_RATE ) {
+                                    yVelocityCaculated = ANGULAR_RATE;
+                                }
+                                if ( yVelocityCaculated < -ANGULAR_RATE) {
+                                    yVelocityCaculated = -ANGULAR_RATE;
+                                }
+
+                                Log.d("9010", "Y  Error: " + yError );
+                                Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
+
+                                //Target Yaw is 0
+                                double turnError = - loopDetetion.ftcPose.yaw;
+                                rx = turnPidfCrtler.calculate(turnError)*50;
+
+                                Log.d("9010", "Turn Error: " + turnError );
+                                Log.d("9010", "Calculated rx:  " + rx );
+
+
+                                wheelFrontLeft.setVelocity(yVelocityCaculated + rx - xVelocityCaculated);
+                                wheelBackLeft.setVelocity(yVelocityCaculated + rx+ xVelocityCaculated);
+                                wheelFrontRight.setVelocity(yVelocityCaculated - rx + xVelocityCaculated);
+                                wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
+
+                                newDetectionFound = true;
+                            }
                         }
-                        if ( xVelocityCaculated < -ANGULAR_RATE) {
-                            xVelocityCaculated = -ANGULAR_RATE;
-                        }
-                        Log.d("9010", "===================================" );
-                        Log.d("9010", "x  Error: " + xError );
-                        Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
 
-                        yError = detection.ftcPose.y - targetY ;
-                        double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff;
-                        if (yVelocityCaculated > ANGULAR_RATE ) {
-                            yVelocityCaculated = ANGULAR_RATE;
-                        }
-                        if ( yVelocityCaculated < -ANGULAR_RATE) {
-                            yVelocityCaculated = -ANGULAR_RATE;
+                        if(!newDetectionFound) {
+                            Log.d("9010" , "Can't find april tag, Abort tag id: " + tagId);
+                            break;
                         }
 
-                        Log.d("9010", "Y  Error: " + yError );
-                        Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
-
-                        //Target Yaw is 0
-                        double turnError =detection.ftcPose.yaw;
-                        rx = turnPidfCrtler.calculate(turnError)*200;
-
-
-                        Log.d("9010", "Turn Error: " + turnError );
-                        Log.d("9010", "Calculated rx:  " + rx );
-
-
-                        wheelFrontLeft.setVelocity(yVelocityCaculated + rx - xVelocityCaculated);
-                        wheelBackLeft.setVelocity(yVelocityCaculated + rx+ xVelocityCaculated);
-                        wheelFrontRight.setVelocity(yVelocityCaculated - rx + xVelocityCaculated);
-                        wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
                     } // while loop
 
                     Log.d("9010", "After PID Loop ");

@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 public class Hardware2022 {
 
     //This is max wheel and slide motor velocity.
-    static public double ANGULAR_RATE = 2000.0;
+    static public double ANGULAR_RATE = 1000.0;
     private final double MIN_VELOCITY = 0.1;
 
     //Adjustable parameters  here.
