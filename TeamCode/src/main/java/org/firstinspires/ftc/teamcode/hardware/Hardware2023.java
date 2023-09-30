@@ -571,8 +571,8 @@ public class Hardware2023 {
      * @param targetY   distance of robot to the april tag,  unit in inches.
      * @param targetX   horizontal shift to the center of april tag.  unit in inces
      */
-    public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) {
-
+    public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) throws InterruptedException {
+        //visionPortal.setProcessorEnabled(aprilTagProc,true);
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -590,6 +590,7 @@ public class Hardware2023 {
             //No tag found, do nothing.
             telemetry.addData("No AprilTags Detected", currentDetections.size());
             Log.d("9010", "No AprilTags Detected"  + tagId );
+            //visionPortal.setProcessorEnabled(aprilTagProc,false);
             return;
         } else {
             //Loop though tags found
@@ -686,6 +687,8 @@ public class Hardware2023 {
                                 wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
 
                                 newDetectionFound = true;
+                                //Save CPU, and
+                                Thread.sleep(15);
                             }
                         }
 
@@ -705,5 +708,6 @@ public class Hardware2023 {
             } // for ( AprilTagDetection detection : currentDetections) {
         } //End of  if (currentDetections.size()<1 )   {  } else
 
+     //visionPortal.setProcessorEnabled(aprilTagProc,false);
     } // End of public void moveByAprilTag
 }
