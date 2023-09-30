@@ -633,6 +633,7 @@ public class Hardware2023 {
                     double xError =0 ;
                     double yError =0;
                     double rx = 0;
+                    boolean newDetectionFound = false;
 
                     Log.d("9010", "Before entering Loop ");
                     long initMill = System.currentTimeMillis();
@@ -641,7 +642,7 @@ public class Hardware2023 {
 
                         //Get new april tag  detection
                         List<AprilTagDetection> loopDetections = aprilTagProc.getDetections();
-                        boolean newDetectionFound = false;
+                        newDetectionFound = false;
                         for (AprilTagDetection loopDetetion : loopDetections) {
                             if ( loopDetetion.id == tagId) {
                                 Log.d("9010", "===================================" );
