@@ -569,22 +569,25 @@ public class Hardware2023 {
      *
      * @param tagId    Id of the tag to be used for reference.
      * @param targetY   distance of robot to the april tag,  unit in inches.
-     * @param targetX   horizontal shift to the center of april tag.  unit in inces
+     * @param targetX   horizontal shift to the center of april tag.  unit in inches.  Positive
+     *                  means tag is on the right of robot camera.
      */
     public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) throws InterruptedException {
         //visionPortal.setProcessorEnabled(aprilTagProc,true);
+
+        //Set motor to run in encoder mode, use angular velocity to control motor instead of power.
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        //Put motor back into run with encoder mode.
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //Start April Tag detection fo find tag
+        //Start April Tag detection fo find tag, possible multiple tag in camera frame,
+        //So result is a list.
         List<AprilTagDetection> currentDetections = aprilTagProc.getDetections();
         if (currentDetections.size()<1 ) {
             //No tag found, do nothing.
@@ -597,7 +600,7 @@ public class Hardware2023 {
             for ( AprilTagDetection detection : currentDetections) {
                 if ( detection.id == tagId) {
                     //Here we found our target April Tag.
-                    //Get Error
+                    //Get Initial Error
                     double currenX = detection.ftcPose.x;
                     Log.d("9010", "current X " + currenX);
                     double currenY = detection.ftcPose.y;
@@ -614,13 +617,13 @@ public class Hardware2023 {
                     Log.d("9010", "turn Kp: " + turnKP + "  KI: " + turnKI + " KD: " + turnKD);
 
                     lnYPidfCrtler.setSetPoint(0);
-                    //Set tolerance as 0.5 degrees
+                    //Set Y tolerance as 0.2 inches
                     lnYPidfCrtler.setTolerance(0.2);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     lnYPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
 
                     lnXPidfCrtler.setSetPoint(0);
-                    //Set tolerance as 0.5 degrees
+                    //Set X tolerance as 0.2 inches
                     lnXPidfCrtler.setTolerance(0.2);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     lnXPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
