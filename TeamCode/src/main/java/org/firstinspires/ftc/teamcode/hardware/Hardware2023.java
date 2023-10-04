@@ -59,7 +59,7 @@ public class Hardware2023 {
 
     private double lnKP = 0.15;
     private double lnKI = 0.1;
-    private double lnKD = 0.005;
+    private double lnKD = 0.007;
     private double lnKF = 0.0;
 
     public double getLnKF() {   return lnKF;    }
@@ -611,7 +611,7 @@ public class Hardware2023 {
                     double currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
                     Log.d("9010", "current heading from IMU: " + currentHeading);
                     double endHeading = regulateDegree( currentHeading + initYaw );
-                    Log.d("9010", "End heading by correcting Yaw: " + currentHeading);
+                    Log.d("9010", "End heading by correcting Yaw: " + endHeading);
 
                     //Initialize PID controller for X, Y and turn
                     PIDFController lnYPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
@@ -660,9 +660,9 @@ public class Hardware2023 {
                                 Log.d("9010", "===================================" );
                                 Log.d("9010" , "Find new detection for Tag: " + tagId);
                                 //Calculate X, Y and turn by the april tag input
-                                xError =  loopDetetion.ftcPose.x - targetX ;
+                                xError =   targetX -loopDetetion.ftcPose.x;
 
-                                double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff/2;
+                                double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff *2;
                                 if (xVelocityCaculated > ANGULAR_RATE ) {
                                     xVelocityCaculated = ANGULAR_RATE;
                                 }
@@ -674,7 +674,7 @@ public class Hardware2023 {
                                 Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
 
                                 yError =  loopDetetion.ftcPose.y - targetY;
-                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff;
+                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff * 1.5;
                                 if (yVelocityCaculated > ANGULAR_RATE ) {
                                     yVelocityCaculated = ANGULAR_RATE;
                                 }

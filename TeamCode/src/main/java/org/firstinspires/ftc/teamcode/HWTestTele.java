@@ -59,7 +59,7 @@ public class HWTestTele  extends LinearOpMode {
             //Move to April Tag, using new KID parameters.
             if (gamepad1.a) {
                 hdw.setLnKP(pidCoffs[0]);
-                hdw.setLnKI(pidCoffs[1]);
+                hdw.setLnKI(pidCoffs[2]);
                 hdw.setLnKD(pidCoffs[2]);
                 hdw.moveByAprilTag(4 , 12, -1);
             }
