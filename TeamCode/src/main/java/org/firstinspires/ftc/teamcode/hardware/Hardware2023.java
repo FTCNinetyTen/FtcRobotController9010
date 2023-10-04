@@ -630,7 +630,7 @@ public class Hardware2023 {
 
                     turnPidfCrtler.setSetPoint(0);
                     //Set tolerance as 0.5 degrees
-                    turnPidfCrtler.setTolerance(0.5);
+                    turnPidfCrtler.setTolerance(5);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
 
@@ -644,6 +644,9 @@ public class Hardware2023 {
                     while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )
                             && ( (System.currentTimeMillis() -initMill  )<5000)  ) {
 
+                        //Save CPU, and
+                        Thread.sleep(15);
+
                         //Get new april tag  detection
                         List<AprilTagDetection> loopDetections = aprilTagProc.getDetections();
                         newDetectionFound = false;
@@ -654,7 +657,7 @@ public class Hardware2023 {
                                 //Calculate X, Y and turn by the april tag input
                                 xError =  loopDetetion.ftcPose.x - targetX ;
 
-                                double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff/5;
+                                double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff/2;
                                 if (xVelocityCaculated > ANGULAR_RATE ) {
                                     xVelocityCaculated = ANGULAR_RATE;
                                 }
@@ -666,7 +669,7 @@ public class Hardware2023 {
                                 Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
 
                                 yError =  loopDetetion.ftcPose.y - targetY;
-                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff/2;
+                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff;
                                 if (yVelocityCaculated > ANGULAR_RATE ) {
                                     yVelocityCaculated = ANGULAR_RATE;
                                 }
@@ -678,8 +681,8 @@ public class Hardware2023 {
                                 Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
 
                                 //Target Yaw is 0
-                                double turnError =  loopDetetion.ftcPose.yaw;
-                                rx = turnPidfCrtler.calculate(turnError)*20;
+                                double turnError = - loopDetetion.ftcPose.yaw;
+                                rx = turnPidfCrtler.calculate(turnError)*35;
 
                                 Log.d("9010", "Turn Error: " + turnError );
                                 Log.d("9010", "Calculated rx:  " + rx );
@@ -690,14 +693,15 @@ public class Hardware2023 {
                                 wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
 
                                 newDetectionFound = true;
-                                //Save CPU, and
-                                Thread.sleep(15);
                             }
                         }
 
                         if(!newDetectionFound) {
                             Log.d("9010" , "Can't find april tag, Abort tag id: " + tagId);
-                            break;
+                            wheelFrontRight.setVelocity(0);
+                            wheelFrontLeft.setVelocity(0);
+                            wheelBackRight.setVelocity(0);
+                            wheelBackLeft.setVelocity(0);
                         }
 
                     } // while loop
