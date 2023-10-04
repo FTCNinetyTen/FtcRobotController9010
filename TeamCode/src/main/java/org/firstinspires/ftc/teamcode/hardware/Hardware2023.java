@@ -601,12 +601,17 @@ public class Hardware2023 {
                 if ( detection.id == tagId) {
                     //Here we found our target April Tag.
                     //Get Initial Error
-                    double currenX = detection.ftcPose.x;
-                    Log.d("9010", "current X " + currenX);
-                    double currenY = detection.ftcPose.y;
-                    Log.d("9010", "current Y  " + currenY);
-                    double currentYaw = detection.ftcPose.yaw;
-                    Log.d("9010", "current Yaw " + currentYaw);
+                    double initX = detection.ftcPose.x;
+                    Log.d("9010", "current X " + initX);
+                    double initY = detection.ftcPose.y;
+                    Log.d("9010", "current Y  " + initY);
+                    double initYaw = detection.ftcPose.yaw;
+                    Log.d("9010", "current Yaw " + initYaw);
+
+                    double currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                    Log.d("9010", "current heading from IMU: " + currentHeading);
+                    double endHeading = regulateDegree( currentHeading + initYaw );
+                    Log.d("9010", "End heading by correcting Yaw: " + currentHeading);
 
                     //Initialize PID controller for X, Y and turn
                     PIDFController lnYPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
@@ -630,7 +635,7 @@ public class Hardware2023 {
 
                     turnPidfCrtler.setSetPoint(0);
                     //Set tolerance as 0.5 degrees
-                    turnPidfCrtler.setTolerance(5);
+                    turnPidfCrtler.setTolerance(0.5);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
 
@@ -644,8 +649,8 @@ public class Hardware2023 {
                     while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )
                             && ( (System.currentTimeMillis() -initMill  )<5000)  ) {
 
-                        //Save CPU, and
-                        Thread.sleep(15);
+                        //Save CPU
+                        Thread.sleep(20);
 
                         //Get new april tag  detection
                         List<AprilTagDetection> loopDetections = aprilTagProc.getDetections();
@@ -681,7 +686,10 @@ public class Hardware2023 {
                                 Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
 
                                 //Target Yaw is 0
-                                double turnError = - loopDetetion.ftcPose.yaw;
+                                //Instead of using april tag reading,  use initial reading by April
+                                //Tag and in the loop use IMU.
+                                currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                                double turnError = regulateDegree( currentHeading - endHeading );
                                 rx = turnPidfCrtler.calculate(turnError)*35;
 
                                 Log.d("9010", "Turn Error: " + turnError );
