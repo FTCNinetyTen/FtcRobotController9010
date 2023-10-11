@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
 public class HWTestTele  extends LinearOpMode {
     Hardware2023 hdw;
 
-    double[] pidCoffs = { 0.15,0.1,0.005 };
+    double[] pidCoffs = { 0.15,0.20,0.032 };
     int pidCoffIndex = 0;
 
     @Override
@@ -39,7 +39,7 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveXAxis(2.0, .5);
+                hdw.moveXAxis(4.0, .5);
             }
             if (gamepad1.dpad_up) {
                 telemetry.addLine().addData("[moving y >]  ", " Y ");
@@ -53,13 +53,13 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveYAxis (-2.0, -.5);
+                hdw.moveYAxis (-4.0, -.5);
             }
 
             //Move to April Tag, using new KID parameters.
             if (gamepad1.a) {
                 hdw.setLnKP(pidCoffs[0]);
-                hdw.setLnKI(pidCoffs[2]);
+                hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
                 hdw.moveByAprilTag(4 , 12, -1);
             }

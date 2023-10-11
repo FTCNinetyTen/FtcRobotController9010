@@ -58,8 +58,8 @@ public class Hardware2023 {
     private double turnKF = 0.0;
 
     private double lnKP = 0.15;
-    private double lnKI = 0.1;
-    private double lnKD = 0.007;
+    private double lnKI = 0.20;
+    private double lnKD = 0.032;
     private double lnKF = 0.0;
 
     public double getLnKF() {   return lnKF;    }
@@ -258,7 +258,7 @@ public class Hardware2023 {
         PIDFController lnPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
         Log.d("9010", "lnKp: " + lnKP + "  lnKI: " + lnKI + " lnKD: " + lnKD);
         //Give X compansation more KP
-        PIDFController lnXPidfCrtler  = new PIDFController(0.2, lnKI, lnKD, lnKF);
+        PIDFController lnXPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
         Log.d("9010", "lnXKp: " + lnKP + "  lnXKI: " + lnKI + " lnXKD: " + lnKD);
         PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
@@ -268,19 +268,19 @@ public class Hardware2023 {
         //Set tolerance as 0.5 degrees
         lnPidfCrtler.setTolerance(15);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+        lnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         lnXPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
         lnXPidfCrtler.setTolerance(20);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnXPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+        lnXPidfCrtler.setIntegrationBounds(-1 , 1);
 
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
         turnPidfCrtler.setTolerance(0.5);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+        turnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         Log.d("9010", "Before entering Loop ");
         double rx;
@@ -381,7 +381,7 @@ public class Hardware2023 {
 
         PIDFController lnPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
         Log.d("9010", "lnKp: " + lnKP + "  lnKI: " + lnKI + " lnKD: " + lnKD);
-        PIDFController lnYPidfCrtler  = new PIDFController(0.3, lnKI, lnKD, lnKF);
+        PIDFController lnYPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
         Log.d("9010", "lnYKp: " + lnKP + "  lnYKI: " + lnKI + " lnYKD: " + lnKD);
         PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
@@ -391,21 +391,21 @@ public class Hardware2023 {
         //Set tolerance as 15 clicks in encoder
         lnPidfCrtler.setTolerance(15);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+        lnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         //AUX PID controller compensating Y Axis move
         lnYPidfCrtler.setSetPoint(0);
         //Set tolerance as clicks in encoder
         lnYPidfCrtler.setTolerance(20);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnYPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+        lnYPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         //PID controller compensating for turn .
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
         turnPidfCrtler.setTolerance(0.5);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+        turnPidfCrtler.setIntegrationBounds(-1 , 1);
 
         Log.d("9010", "Before entering Loop ");
         double rx;
@@ -625,19 +625,19 @@ public class Hardware2023 {
                     //Set Y tolerance as 0.2 inches
                     lnYPidfCrtler.setTolerance(0.2);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-                    lnYPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+                    lnYPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     lnXPidfCrtler.setSetPoint(0);
                     //Set X tolerance as 0.2 inches
                     lnXPidfCrtler.setTolerance(0.2);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-                    lnXPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+                    lnXPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     turnPidfCrtler.setSetPoint(0);
                     //Set tolerance as 0.5 degrees
                     turnPidfCrtler.setTolerance(0.5);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-                    turnPidfCrtler.setIntegrationBounds(-0.5 , 0.5 );
+                    turnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     double xError =0 ;
                     double yError =0;
