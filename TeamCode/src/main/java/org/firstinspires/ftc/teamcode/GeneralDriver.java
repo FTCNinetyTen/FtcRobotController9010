@@ -36,17 +36,18 @@ public class GeneralDriver extends LinearOpMode {
             //hdw.checkAndGrabCone();
 
             if (gamepad1.left_bumper) {
-                hdw.goToHeight(Hardware2022.SlideHeight.Mid);
+                //hdw.goToHeight(Hardware2022.SlideHeight.Mid);
             }
             if (gamepad1.right_bumper) {
-                hdw.goToHeight(Hardware2022.SlideHeight.High);
-                Log.d("9010", "After go to vSLide HIGH");
+                //hdw.goToHeight(Hardware2022.SlideHeight.High);
+                //Log.d("9010", "After go to vSLide HIGH");
             }
             if (gamepad1.dpad_down) {
-                hdw.goToHeight(Hardware2022.SlideHeight.Low);
+                //hdw.goToHeight(Hardware2022.SlideHeight.Low);
             }
 
             if (gamepad1.dpad_right && gamepad1.x) {
+                /*
                 sleep(400);
                 if (hdw.iseMode()) {
                     hdw.seteMode(false);
@@ -59,10 +60,10 @@ public class GeneralDriver extends LinearOpMode {
                     telemetry.update();
                 }
 
-            }
+                 */
 
-                //hdw.freeLowerVerticalSlide(gamepad1.left_trigger);
-                hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
+            }
+                //hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
                 //Wheel takes input of gampad 1  ,  turbo is the power factor. Range 0-1 , 1 is 100%
                 robotWheel.joystick(gamepad1, 1);
