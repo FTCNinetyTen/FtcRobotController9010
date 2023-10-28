@@ -20,11 +20,11 @@ public class ProtoTele2023 extends LinearOpMode  {
     private DcMotorEx vSlideM = null;
     private DcMotorEx vSlideS = null;
 
-    private double slideKP = 15.19;
-    private double slideKI = 3.2;
-    private double slideKD = 0.16;
+    private double slideKP = 1.27;
+    private double slideKI = 0.03;
+    private double slideKD = 0.001;
 
-    double[] pidCoffs = { 15.19,3.2,0.16 };
+    double[] pidCoffs = { 1.27,0.03,0.001 };
     int pidCoffIndex = 0;
 
     private double ANGULAR_RATE = 2200;
@@ -51,7 +51,7 @@ public class ProtoTele2023 extends LinearOpMode  {
         //Set tolerance as 0.5 degrees
         slidePID.setTolerance(10);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        slidePID.setIntegrationBounds(-0.8 , 0.8 );
+        slidePID.setIntegrationBounds(-0.5 , 0.5 );
 
         double diff = 0 ;
         double calculatedVelocity = 0 ;
@@ -89,7 +89,7 @@ public class ProtoTele2023 extends LinearOpMode  {
                 if ( pidCoffIndex == 2) {
                     pidCoffs[pidCoffIndex] -= 0.01;
                 } else {
-                    pidCoffs[pidCoffIndex] -= 0.1;
+                    pidCoffs[pidCoffIndex] -= 0.01;
                 }
                 telemetry.addLine().addData("[Kp :]  ", pidCoffs[0]);
                 telemetry.addLine().addData("[Ki :]  ", pidCoffs[1]);
@@ -106,7 +106,7 @@ public class ProtoTele2023 extends LinearOpMode  {
                 if ( pidCoffIndex == 2) {
                     pidCoffs[pidCoffIndex] += 0.01;
                 } else {
-                    pidCoffs[pidCoffIndex] += 0.1;
+                    pidCoffs[pidCoffIndex] += 0.01;
                 }
                 telemetry.addLine().addData("[Kp :]  ", pidCoffs[0]);
                 telemetry.addLine().addData("[Ki :]  ", pidCoffs[1]);
@@ -137,7 +137,9 @@ public class ProtoTele2023 extends LinearOpMode  {
 
             //Control 2 Vslide in Sync
             vSlideM.setVelocity(gamepad1.left_stick_y * ANGULAR_RATE);
-            vSlideS.setVelocity(gamepad1.left_stick_y *ANGULAR_RATE - calculatedVelocity );
+            //vSlideS.setVelocity(gamepad1.left_stick_y *ANGULAR_RATE - calculatedVelocity );
+            vSlideS.setVelocity(gamepad1.left_stick_y *ANGULAR_RATE );
+
 
             /*
             Log.d("9010", "Gamepad leftStick: " + gamepad1.left_stick_y  );
