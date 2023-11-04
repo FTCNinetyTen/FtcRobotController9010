@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode.hardware;
 import android.util.Log;
 import android.util.Size;
 
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -45,6 +47,8 @@ public class Hardware2023 {
     public DcMotorEx wheelBackLeft = null;
     public DcMotorEx yEncoder = null;
     public DcMotorEx xEncoder = null;
+    public DcMotorEx vSlideM = null;
+    public DcMotorEx vSlideS = null;
 
     //IMU
     public IMU imu =null ;
@@ -68,6 +72,10 @@ public class Hardware2023 {
     private double lnKI = 0.20;
     private double lnKD = 0.032;
     private double lnKF = 0.0;
+
+    private double slideKP = 1.27;
+    private double slideKI = 0.03;
+    private double slideKD = 0.001;
 
     public double getLnKF() {   return lnKF;    }
 
@@ -153,8 +161,8 @@ public class Hardware2023 {
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
         wheelBackLeft = hwMap.get(DcMotorEx.class, "lrWheel");
 
-        xEncoder = hwMap.get(DcMotorEx.class, "xEncoder");
-        yEncoder = hwMap.get(DcMotorEx.class, "yEncoder");
+        xEncoder = hwMap.get(DcMotorEx.class, "dwX");
+        yEncoder = hwMap.get(DcMotorEx.class, "dwY");
 
 
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -172,8 +180,22 @@ public class Hardware2023 {
         wheelFrontLeft.setVelocity(0);
         wheelBackLeft.setVelocity(0);
 
+        //Initialize Slide
+        vSlideM = hwMap.get(DcMotorEx.class, "vSlideM");
+        vSlideS = hwMap.get(DcMotorEx.class, "vSlideS");
+        vSlideM.setDirection(DcMotorSimple.Direction.FORWARD);
+        vSlideM.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        vSlideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vSlideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        vSlideS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vSlideS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
         //Get IMU.
         imu = hwMap.get(IMU.class, "imu");
+
         //TODO: Update accordingly for the orientation of Control Hub.
         //Our robot mount Control hub Logo face backward, and USB port is facing Up.
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
@@ -792,4 +814,76 @@ public class Hardware2023 {
 
      //visionPortal.setProcessorEnabled(aprilTagProc,false);
     } // End of public void moveByAprilTag
+
+
+    /**
+     * Move vertical Slide freely , using game control
+     * @param power
+     */
+    public void freeMoveVerticalSlide(float power ) {
+
+        PIDController slidePID = new PIDController(slideKP, slideKI, slideKD);
+        slidePID.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        slidePID.setTolerance(10);
+        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
+        slidePID.setIntegrationBounds(-0.5 , 0.5 );
+
+
+        double diff = vSlideM.getCurrentPosition() - vSlideS.getCurrentPosition();
+
+        double calculatedVelocity = slidePID.calculate(diff)   ;
+        if (calculatedVelocity > ANGULAR_RATE ) {
+            calculatedVelocity = ANGULAR_RATE;
+        }
+        if ( calculatedVelocity < -ANGULAR_RATE) {
+            calculatedVelocity = -ANGULAR_RATE;
+        }
+
+        //Control 2 Vslide in Sync
+        vSlideM.setVelocity(power * ANGULAR_RATE);
+        vSlideS.setVelocity(power *ANGULAR_RATE - calculatedVelocity );
+        //vSlideS.setVelocity(power *ANGULAR_RATE );
+
+    }
+
+
+    /**
+     *
+     * @param height  This is the encoder reading for the height
+     *
+     */
+    public void moveSlideToHeight ( int height ) {
+        int targetPosition = height;
+        int currentPosition = vSlideM.getCurrentPosition();
+
+        vSlideM.setTargetPosition(targetPosition);
+        vSlideS.setTargetPosition(targetPosition);
+        vSlideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        vSlideS.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int sign = 1;
+
+        if ((currentPosition - targetPosition) > 0 ) {
+            sign= -1;
+        } else {
+            //raise slide
+            sign = 1;
+        }
+
+        while (vSlideM.isBusy()) {
+            vSlideM.setVelocity( sign * ANGULAR_RATE* 0.5 );
+            vSlideS.setVelocity( sign * ANGULAR_RATE* 0.5 );
+            //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
+        }
+        vSlideM.setVelocity(0);
+        vSlideS.setVelocity(0);
+        Log.d("9010", "after Moving, slide position : " + vSlideM.getCurrentPosition());
+
+        //Set mode back to Run using encoder.
+        vSlideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        vSlideS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+
 }
