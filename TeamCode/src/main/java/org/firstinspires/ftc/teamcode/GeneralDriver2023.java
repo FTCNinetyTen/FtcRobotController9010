@@ -29,10 +29,13 @@ public class GeneralDriver2023 extends LinearOpMode {
         waitForStart();
         telemetry.clearAll();
 
-
         //This is the main loop of operation.
         while (opModeIsActive()) {
-            //hdw.checkAndGrabCone();
+
+            if (gamepad1.dpad_up) {
+                hdw.moveByAprilTag(4 , 12, -1);
+            }
+
 
             hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 

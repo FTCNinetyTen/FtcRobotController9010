@@ -26,7 +26,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
         waitForStart();
 
-        //1. Detect Team Prop
+       //1. detect Team Prop
 
         //2. Put purple pixel in place
 

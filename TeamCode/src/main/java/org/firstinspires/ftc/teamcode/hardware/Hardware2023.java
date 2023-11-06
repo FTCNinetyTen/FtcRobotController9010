@@ -11,17 +11,22 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -39,6 +44,9 @@ public class Hardware2023 {
             "BlueTP","RedTP"
     };
 
+    //servos
+    public Servo boxGate = null;
+
 
     //motors
     public DcMotorEx wheelFrontRight = null;
@@ -51,7 +59,7 @@ public class Hardware2023 {
     public DcMotorEx vSlideS = null;
 
     //IMU
-    public IMU imu =null ;
+    public IMU imu = null;
 
     //This is max wheel and slide motor velocity.
     static public double ANGULAR_RATE = 2000.0;
@@ -265,8 +273,9 @@ public class Hardware2023 {
         // Disable or re-enable the TFOD processor at any time.
         //visionPortal.setProcessorEnabled(tfod, true);
 
-    }   // end method initTfod()
+        // end method initTfod()
 
+    }
     public void closeVisionPortal (){
         visionPortal.close();
     }
@@ -307,6 +316,7 @@ public class Hardware2023 {
         //visionPortal.setProcessorEnabled(aprilTag, true);
 
     }   // end method initAprilTag()
+
 
 
     /**
@@ -883,6 +893,81 @@ public class Hardware2023 {
         //Set mode back to Run using encoder.
         vSlideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         vSlideS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void openBox () {
+         boxGate.setPosition(.5);
+
+    }
+
+
+    /**
+     * This method detect the posiiton of Team Prop
+     *
+     * @return
+     */
+    public TeamPropPosition detectTeamProp (String targetTeamProp ) throws InterruptedException {
+        int left = 80;
+        int center = 300;
+        int right = 500;
+        TeamPropPosition foundPosition= null ;
+
+        initTfod();
+
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+        if (currentRecognitions.size()<1) {
+            //If can't find any object.
+            Log.d("9010", "Can't find object " + currentRecognitions.size());
+            Thread.sleep(1000);
+            currentRecognitions = tfod.getRecognitions();
+            if (currentRecognitions.size()<1) {
+                Log.d("9010", "Still Can't find object, " + currentRecognitions.size());
+                closeVisionPortal();
+                return TeamPropPosition.UNKOWN;
+            }
+        }
+
+        // Find out the correct regconition.
+        List<Recognition> filteredRec = new ArrayList<Recognition>();
+        for (Recognition recognition : currentRecognitions) {
+            if (recognition.getLabel().equals(targetTeamProp)) {
+                filteredRec.add(recognition);
+            }
+        }
+
+        class recComparator implements Comparator<Recognition> {
+            @Override
+            public int compare(Recognition recognition, Recognition t1) {
+                return Math.round( t1.getConfidence() -recognition.getConfidence()  );
+            }
+        }
+        Collections.sort(filteredRec, new recComparator());
+
+        for (Recognition recognition: filteredRec) {
+            double x = (recognition.getLeft() + recognition.getRight()) / 2;
+            double y = (recognition.getTop() + recognition.getBottom()) / 2;
+            Log.d("9010", "Label: " + recognition.getLabel());
+            Log.d("9010","Confidence: " + recognition.getConfidence() );
+            Log.d("9010","X: " + x );
+        }
+
+        Recognition discoveredRec = filteredRec.get(0);
+        double x = (discoveredRec.getLeft() + discoveredRec.getRight()) / 2;
+        double diff1 = Math.abs(x - left);
+        double diff2 = Math.abs(x - center);
+        double diff3 = Math.abs(x - right);
+
+        double smallest = Math.min(diff1, Math.min(diff2, diff3));
+        if ( smallest == diff1) {
+            foundPosition = TeamPropPosition.LEFT;
+        } else if (smallest == diff2 ){
+            foundPosition = TeamPropPosition.CENTER;
+        } else if ( smallest == diff3 ) {
+            foundPosition = TeamPropPosition.RIGHT;
+        }
+
+        closeVisionPortal();
+        return foundPosition;
     }
 
 
