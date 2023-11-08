@@ -12,8 +12,10 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 @Autonomous(name = "RedRightAuto")
 public class RedRightAuto extends BaseAuto {
 
-    String targetTeamTP="BlueTP";
 
+    public RedRightAuto () {
+        targetTeamTP="RedTP";
+    }
     void moveBeforeBoard() {
 
     }

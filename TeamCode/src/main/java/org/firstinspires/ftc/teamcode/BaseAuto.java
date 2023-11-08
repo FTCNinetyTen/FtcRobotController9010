@@ -18,6 +18,7 @@ public abstract class BaseAuto extends LinearOpMode {
     String targetTeamTP=null;
 
     abstract void moveBeforeBoard();
+    TeamPropPosition detectedPosition = null;
 
     @Override
     public void runOpMode() {
@@ -26,17 +27,25 @@ public abstract class BaseAuto extends LinearOpMode {
 
         waitForStart();
 
-       //1. detect Team Prop
-
-        //2. Put purple pixel in place
-
-        //3. Move before the board
-        moveBeforeBoard();
-
-        //4. Score Yellow Pixel
-
 
         while (opModeIsActive())  {
+            //1. detect Team Prop
+
+            try {
+                detectedPosition = hdw.detectTeamProp(targetTeamTP);
+            } catch (InterruptedException e) {
+                detectedPosition = TeamPropPosition.UNKOWN;
+            }
+            Log.d("9010", "Detected: " + detectedPosition);
+
+            //2. Put purple pixel in place
+
+            //3. Move before the board
+            moveBeforeBoard();
+
+            //4. Score Yellow Pixel
+
+
             idle();
         }
 

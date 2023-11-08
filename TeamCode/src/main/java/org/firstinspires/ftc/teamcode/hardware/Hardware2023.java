@@ -690,8 +690,9 @@ public class Hardware2023 {
         List<AprilTagDetection> currentDetections = aprilTagProc.getDetections();
         if (currentDetections.size()<1 ) {
             //No tag found, do nothing.
-            telemetry.addData("No AprilTags Detected", currentDetections.size());
-            Log.d("9010", "No AprilTags Detected"  + tagId );
+            telemetry.addData("No AprilTags Detected ", currentDetections.size());
+            telemetry.update();
+            Log.d("9010", "No AprilTags Detected "  + tagId );
             //visionPortal.setProcessorEnabled(aprilTagProc,false);
             return;
         } else {
@@ -910,7 +911,7 @@ public class Hardware2023 {
         int left = 80;
         int center = 300;
         int right = 500;
-        TeamPropPosition foundPosition= null ;
+        TeamPropPosition foundPosition= null;
 
         initTfod();
 

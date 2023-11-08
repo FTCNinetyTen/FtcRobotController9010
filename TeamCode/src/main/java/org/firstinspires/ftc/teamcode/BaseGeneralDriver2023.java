@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -23,6 +25,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
         hdw = new Hardware2023(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
         robotWheel = new MecanumWheels();
+        hdw.initAprilTag();
 
         double powerDrivePercentage = 0.55;
 
@@ -37,6 +40,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
 
             //Use DPad to move to according April tag
             if (gamepad1.dpad_left) {
+                Log.d("9010", "alliance " + alliance);
                 if ( alliance.equals(BLUE)) {
                     hdw.moveByAprilTag(1 , 12, 0);
                 } else {
@@ -63,11 +67,13 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
                     robotWheel.setHeadingForward(false);
                 } else {
                     robotWheel.setHeadingForward(true);
-
                 }
-                telemetry.addData("[>]", "Robot Heading Forword: " + robotWheel.isHeadingForward());
+                sleep(100);
             }
 
+            telemetry.clearAll();
+            telemetry.addData("[>]", "Robot Heading Forward: " + robotWheel.isHeadingForward());
+            telemetry.update();
 
             hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
