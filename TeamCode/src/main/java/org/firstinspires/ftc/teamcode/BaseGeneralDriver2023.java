@@ -7,13 +7,16 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels;
 
-@TeleOp(name="GeneralDriver2023", group="TeleOps")
-public class GeneralDriver2023 extends LinearOpMode {
+
+public class BaseGeneralDriver2023 extends LinearOpMode {
 
     private boolean debug = true;
-    Hardware2023 hdw;
+    private Hardware2023 hdw;
+    private MecanumWheels robotWheel;
 
-    MecanumWheels robotWheel;
+    String alliance ;
+    String BLUE="Blue";
+    String RED="Red";
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -23,7 +26,7 @@ public class GeneralDriver2023 extends LinearOpMode {
 
         double powerDrivePercentage = 0.55;
 
-        telemetry.addData("[>]", "All set?");
+        telemetry.addData("[>]", "All set? For allience: " + alliance);
         telemetry.update();
 
         waitForStart();
@@ -32,8 +35,37 @@ public class GeneralDriver2023 extends LinearOpMode {
         //This is the main loop of operation.
         while (opModeIsActive()) {
 
+            //Use DPad to move to according April tag
+            if (gamepad1.dpad_left) {
+                if ( alliance.equals(BLUE)) {
+                    hdw.moveByAprilTag(1 , 12, 0);
+                } else {
+                    hdw.moveByAprilTag(4 , 12, 0);
+                }
+            }
             if (gamepad1.dpad_up) {
-                hdw.moveByAprilTag(4 , 12, -1);
+                if ( alliance.equals(BLUE)) {
+                    hdw.moveByAprilTag(2 , 12, 0);
+                } else {
+                    hdw.moveByAprilTag(5 , 12, 0);
+                }
+            }
+            if (gamepad1.dpad_right) {
+                if ( alliance.equals(BLUE)) {
+                    hdw.moveByAprilTag(3 , 12, 0);
+                } else {
+                    hdw.moveByAprilTag(6 , 12, 0);
+                }
+            }
+
+            if (gamepad1.y) {
+                if (robotWheel.isHeadingForward()) {
+                    robotWheel.setHeadingForward(false);
+                } else {
+                    robotWheel.setHeadingForward(true);
+
+                }
+                telemetry.addData("[>]", "Robot Heading Forword: " + robotWheel.isHeadingForward());
             }
 
 

@@ -22,6 +22,19 @@ public class MecanumWheels {
     public MecanumWheels(){ }
 
     /**
+     * If ture, heading is in front.  other wise, robot heading is reversed.
+     */
+    private boolean isHeadingForward = true;
+
+    public boolean isHeadingForward() {
+        return isHeadingForward;
+    }
+
+    public void setHeadingForward(boolean headingForward) {
+        isHeadingForward = headingForward;
+    }
+
+    /**
      * This method calculate the wheel according to the input of game pad.
      *
      * @param gamepad1  This is the game pad object, that contains input of game pad
@@ -31,9 +44,17 @@ public class MecanumWheels {
 
         this.turbo = turbo;
 
-        double x = gamepad1.left_stick_x; //Math.pow(gamepad1.left_stick_x,3.0);
-        double y =  gamepad1.left_stick_y; //Math.pow(gamepad1.left_stick_y,3.0);
-        double rx = gamepad1.right_stick_x; //Math.pow(gamepad1.right_stick_x,3.0);
+        double x ,y ;
+        if ( isHeadingForward ) {
+            x  =  gamepad1.left_stick_x;
+            y= gamepad1.left_stick_y;
+        } else {
+            x = - gamepad1.left_stick_x;
+            y =  -  gamepad1.left_stick_y;
+        }
+
+        double rx = gamepad1.right_stick_x;
+
         wheelFrontLeftPower   = y - x  - rx ;
         wheelBackLeftPower    = y + x - rx;
         wheelFrontRightPower  = y + x + rx;
