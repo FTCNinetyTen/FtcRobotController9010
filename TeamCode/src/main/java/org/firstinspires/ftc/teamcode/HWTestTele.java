@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
 public class HWTestTele  extends LinearOpMode {
     Hardware2023 hdw;
 
-    double[] pidCoffs = { 0.15,0.20,0.032 };
+    double[] pidCoffs = { 1.5,0.15,0.11 };
     int pidCoffIndex = 0;
 
     @Override
@@ -124,7 +124,6 @@ public class HWTestTele  extends LinearOpMode {
             if (gamepad1.left_stick_button) {
 
             }
-
 
         }
     }

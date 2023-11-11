@@ -62,7 +62,7 @@ public class Hardware2023 {
     public IMU imu = null;
 
     //This is max wheel and slide motor velocity.
-    static public double ANGULAR_RATE = 2000.0;
+    static public double ANGULAR_RATE = 2500.0;
 
     private final double xAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in X Axis
     private final double yAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in Y Axis
@@ -76,9 +76,9 @@ public class Hardware2023 {
     private double turnKD = 0.005;
     private double turnKF = 0.0;
 
-    private double lnKP = 0.15;
-    private double lnKI = 0.20;
-    private double lnKD = 0.032;
+    private double lnKP = 1.5;
+    private double lnKI = 0.15;
+    private double lnKD = 0.11;
     private double lnKF = 0.0;
 
     private double slideKP = 1.27;
@@ -367,13 +367,13 @@ public class Hardware2023 {
         //Set tolerance as 0.5 degrees
         lnPidfCrtler.setTolerance(15);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnPidfCrtler.setIntegrationBounds(-1 , 1 );
+        //lnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         lnXPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
         lnXPidfCrtler.setTolerance(20);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnXPidfCrtler.setIntegrationBounds(-1 , 1);
+        //lnXPidfCrtler.setIntegrationBounds(-1 , 1);
 
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
@@ -392,12 +392,12 @@ public class Hardware2023 {
             currentPosition = yEncoder.getCurrentPosition();
             //Calculate new distance
             difference = currentPosition - targetPosition;
-            double velocityCaculated = lnPidfCrtler.calculate(difference)*4;
-            if (velocityCaculated > ANGULAR_RATE ) {
-                velocityCaculated = ANGULAR_RATE;
+            double velocityCaculated = lnPidfCrtler.calculate(difference);
+            if (velocityCaculated > (ANGULAR_RATE/2) ) {
+                velocityCaculated = ANGULAR_RATE/2;
             }
-            if ( velocityCaculated < -ANGULAR_RATE) {
-                velocityCaculated = -ANGULAR_RATE;
+            if ( velocityCaculated < - (ANGULAR_RATE/2)) {
+                velocityCaculated = -ANGULAR_RATE/2;
             }
 
             Log.d("9010", "=====================");
@@ -411,7 +411,7 @@ public class Hardware2023 {
 
             double xError = xEncoder.getCurrentPosition() - currenXPosition;
             Log.d("9010", "X Error " + xError);
-            xVelocity = lnXPidfCrtler.calculate(xError)*7;
+            xVelocity = lnXPidfCrtler.calculate(xError);
             Log.d("9010", "X Velocity:  " + xVelocity);
 
             wheelFrontLeft.setVelocity(velocityCaculated + rx - xVelocity);
@@ -490,14 +490,14 @@ public class Hardware2023 {
         //Set tolerance as 15 clicks in encoder
         lnPidfCrtler.setTolerance(15);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnPidfCrtler.setIntegrationBounds(-1 , 1 );
+        //lnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         //AUX PID controller compensating Y Axis move
         lnYPidfCrtler.setSetPoint(0);
         //Set tolerance as clicks in encoder
         lnYPidfCrtler.setTolerance(20);
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        lnYPidfCrtler.setIntegrationBounds(-1 , 1 );
+        //lnYPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         //PID controller compensating for turn .
         turnPidfCrtler.setSetPoint(0);
@@ -517,12 +517,12 @@ public class Hardware2023 {
             currentPosition = xEncoder.getCurrentPosition();
             //Calculate new distance
             difference = currentPosition - targetPosition;
-            double velocityCaculated = lnPidfCrtler.calculate(difference)*4;
-            if (velocityCaculated > ANGULAR_RATE ) {
-                velocityCaculated = ANGULAR_RATE;
+            double velocityCaculated = lnPidfCrtler.calculate(difference);
+            if (velocityCaculated > (ANGULAR_RATE/2) ) {
+                velocityCaculated = ANGULAR_RATE/2;
             }
-            if ( velocityCaculated < -ANGULAR_RATE) {
-                velocityCaculated = -ANGULAR_RATE;
+            if ( velocityCaculated < -(ANGULAR_RATE/2)) {
+                velocityCaculated = -ANGULAR_RATE/2;
             }
 
             Log.d("9010", "=====================");
@@ -536,7 +536,7 @@ public class Hardware2023 {
 
             double yError = yEncoder.getCurrentPosition() - currentYPosition;
             Log.d("9010", "Y Error " + yError);
-            yVelocity = lnYPidfCrtler.calculate(yError)*7;
+            yVelocity = lnYPidfCrtler.calculate(yError);
             Log.d("9010", "Y Vel:  " + yVelocity);
 
             wheelFrontLeft.setVelocity(-velocityCaculated + rx + yVelocity);
@@ -673,7 +673,7 @@ public class Hardware2023 {
      */
     public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) throws InterruptedException {
         //visionPortal.setProcessorEnabled(aprilTagProc,true);
-
+        Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId );
         //Set motor to run in encoder mode, use angular velocity to control motor instead of power.
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -701,17 +701,17 @@ public class Hardware2023 {
                 if ( detection.id == tagId) {
                     //Here we found our target April Tag.
                     //Get Initial Error
-                    double initX = detection.ftcPose.x;
-                    Log.d("9010", "current X " + initX);
-                    double initY = detection.ftcPose.y;
-                    Log.d("9010", "current Y  " + initY);
+                    double initX = detection.ftcPose.x ;
+                    Log.d("9010", "current X " + initX) ;
+                    double initY = detection.ftcPose.y ;
+                    Log.d("9010", "current Y  " + initY) ;
                     double initYaw = detection.ftcPose.yaw;
                     Log.d("9010", "current Yaw " + initYaw);
 
-                    double currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-                    Log.d("9010", "current heading from IMU: " + currentHeading);
-                    double endHeading = regulateDegree( currentHeading + initYaw );
-                    Log.d("9010", "End heading by correcting Yaw: " + endHeading);
+                    //1st We turn robot to elimiate the yaw.
+                    turn( initYaw);
+
+                    //Then move robot with X, and Y, to close in to april Tag.
 
                     //Initialize PID controller for X, Y and turn
                     PIDFController lnYPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
@@ -723,15 +723,15 @@ public class Hardware2023 {
 
                     lnYPidfCrtler.setSetPoint(0);
                     //Set Y tolerance as 0.2 inches
-                    lnYPidfCrtler.setTolerance(0.2);
+                    lnYPidfCrtler.setTolerance(50);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-                    lnYPidfCrtler.setIntegrationBounds(-1 , 1 );
+                    //lnYPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     lnXPidfCrtler.setSetPoint(0);
                     //Set X tolerance as 0.2 inches
-                    lnXPidfCrtler.setTolerance(0.2);
+                    lnXPidfCrtler.setTolerance(50);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-                    lnXPidfCrtler.setIntegrationBounds(-1 , 1 );
+                    //lnXPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     turnPidfCrtler.setSetPoint(0);
                     //Set tolerance as 0.5 degrees
@@ -739,80 +739,61 @@ public class Hardware2023 {
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     turnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
-                    double xError =0 ;
-                    double yError =0;
+                    double xError =  0;
+                    double targetXEncoder =   getXAxisPosition() +  (initX + targetX) * xAxisCoeff;
+                    Log.d("9010", "targetXEncoder: " +targetXEncoder );
+                    double yError = 0;
+                    double targetYEncoder = - getYAxisPosition() + (initY - targetY) * yAxisCoeff ;
+                    Log.d("9010", "targetYEncoder: " +targetYEncoder );
+                    double initHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                    double turnError = 0;
                     double rx = 0;
-                    boolean newDetectionFound = false;
 
-                    Log.d("9010", "Before entering Loop ");
-                    long initMill = System.currentTimeMillis();
-                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )
-                            && ( (System.currentTimeMillis() -initMill  )<5000)  ) {
+                    Log.d("9010", "Before entering Loop ===========");
 
-                        //Save CPU
-                        Thread.sleep(20);
+                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )) {
 
-                        //Get new april tag  detection
-                        List<AprilTagDetection> loopDetections = aprilTagProc.getDetections();
-                        newDetectionFound = false;
-                        for (AprilTagDetection loopDetetion : loopDetections) {
-                            if ( loopDetetion.id == tagId) {
-                                Log.d("9010", "===================================" );
-                                Log.d("9010" , "Find new detection for Tag: " + tagId);
-                                //Calculate X, Y and turn by the april tag input
-                                xError =   targetX -loopDetetion.ftcPose.x;
+                        xError =  targetXEncoder - getXAxisPosition();
+                        yError =  targetYEncoder + getYAxisPosition() ;
+                        Log.d("9010", "=====================");
+                        Log.d("9010", "X Positon: " + getXAxisPosition());
+                        Log.d("9010", "Y Positon: " + getYAxisPosition());
 
-                                double xVelocityCaculated = lnXPidfCrtler.calculate(xError) * xAxisCoeff *2;
-                                if (xVelocityCaculated > ANGULAR_RATE ) {
-                                    xVelocityCaculated = ANGULAR_RATE;
-                                }
-                                if ( xVelocityCaculated < -ANGULAR_RATE) {
-                                    xVelocityCaculated = -ANGULAR_RATE;
-                                }
-
-                                Log.d("9010", "x  Error: " + xError );
-                                Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
-
-                                yError =  loopDetetion.ftcPose.y - targetY;
-                                double yVelocityCaculated = lnYPidfCrtler.calculate(yError)* yAxisCoeff * 1.5;
-                                if (yVelocityCaculated > ANGULAR_RATE ) {
-                                    yVelocityCaculated = ANGULAR_RATE;
-                                }
-                                if ( yVelocityCaculated < -ANGULAR_RATE) {
-                                    yVelocityCaculated = -ANGULAR_RATE;
-                                }
-
-                                Log.d("9010", "Y  Error: " + yError );
-                                Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
-
-                                //Target Yaw is 0
-                                //Instead of using april tag reading,  use initial reading by April
-                                //Tag and in the loop use IMU.
-                                currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-                                double turnError = regulateDegree( currentHeading - endHeading );
-                                rx = turnPidfCrtler.calculate(turnError)*35;
-
-                                Log.d("9010", "Turn Error: " + turnError );
-                                Log.d("9010", "Calculated rx:  " + rx );
-
-                                wheelFrontLeft.setVelocity(yVelocityCaculated + rx - xVelocityCaculated);
-                                wheelBackLeft.setVelocity(yVelocityCaculated + rx+ xVelocityCaculated);
-                                wheelFrontRight.setVelocity(yVelocityCaculated - rx + xVelocityCaculated);
-                                wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
-
-                                newDetectionFound = true;
-                            }
+                        double xVelocityCaculated = lnXPidfCrtler.calculate(xError) ;
+                        if (xVelocityCaculated > (ANGULAR_RATE/2 )) {
+                             xVelocityCaculated = ANGULAR_RATE/2;
+                        }
+                        if ( xVelocityCaculated < -(ANGULAR_RATE/2)) {
+                            xVelocityCaculated = -ANGULAR_RATE/2;
                         }
 
-                        if(!newDetectionFound) {
-                            Log.d("9010" , "Can't find april tag, Abort tag id: " + tagId);
-                            wheelFrontRight.setVelocity(0);
-                            wheelFrontLeft.setVelocity(0);
-                            wheelBackRight.setVelocity(0);
-                            wheelBackLeft.setVelocity(0);
+                        Log.d("9010", "x  Error: " + xError );
+                        Log.d("9010", "Calculated x Velocity:  " + xVelocityCaculated );
+
+                        double yVelocityCaculated = lnYPidfCrtler.calculate(yError);
+                        if (yVelocityCaculated > (ANGULAR_RATE/2) ) {
+                            yVelocityCaculated = ANGULAR_RATE/2;
+                        }
+                        if ( yVelocityCaculated < -(ANGULAR_RATE/2)) {
+                            yVelocityCaculated = -ANGULAR_RATE/2;
                         }
 
-                    } // while loop
+                        Log.d("9010", "Y  Error: " + yError );
+                        Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
+
+                        turnError = regulateDegree( initHeading - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+                        rx = turnPidfCrtler.calculate(turnError)*50;
+
+                        Log.d("9010", "Turn Error: " + turnError );
+                        Log.d("9010", "Calculated rx:  " + rx );
+
+                        wheelFrontLeft.setVelocity(yVelocityCaculated + rx - xVelocityCaculated);
+                        wheelBackLeft.setVelocity(yVelocityCaculated + rx+ xVelocityCaculated);
+                        wheelFrontRight.setVelocity(yVelocityCaculated - rx + xVelocityCaculated);
+                        wheelBackRight.setVelocity(yVelocityCaculated - rx - xVelocityCaculated);
+
+                    } //While Loop
+
 
                     Log.d("9010", "After PID Loop ");
                     wheelFrontRight.setVelocity(0);
@@ -825,7 +806,6 @@ public class Hardware2023 {
 
      //visionPortal.setProcessorEnabled(aprilTagProc,false);
     } // End of public void moveByAprilTag
-
 
     /**
      * Move vertical Slide freely , using game control
