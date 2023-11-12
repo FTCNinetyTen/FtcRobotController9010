@@ -567,14 +567,6 @@ public class Hardware2023 {
         moveXAxisDegree((int) Math.round((float) distance * xAxisCoeff), power);
     }
 
-    private int getXAxisPosition( ) {
-        return  wheelFrontLeft.getCurrentPosition() ;
-    }
-
-    private int getYAxisPosition( ) {
-        return  wheelFrontLeft.getCurrentPosition() ;
-    }
-
     /**
      * Turn robot direction.
      *
@@ -740,10 +732,10 @@ public class Hardware2023 {
                     turnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     double xError =  0;
-                    double targetXEncoder =   getXAxisPosition() +  (initX + targetX) * xAxisCoeff;
+                    double targetXEncoder =   xEncoder.getCurrentPosition() +  (initX + targetX) * xAxisCoeff;
                     Log.d("9010", "targetXEncoder: " +targetXEncoder );
                     double yError = 0;
-                    double targetYEncoder = - getYAxisPosition() + (initY - targetY) * yAxisCoeff ;
+                    double targetYEncoder =  yEncoder.getCurrentPosition() + (initY - targetY) * yAxisCoeff ;
                     Log.d("9010", "targetYEncoder: " +targetYEncoder );
                     double initHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
                     double turnError = 0;
@@ -753,11 +745,11 @@ public class Hardware2023 {
 
                     while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )) {
 
-                        xError =  targetXEncoder - getXAxisPosition();
-                        yError =  targetYEncoder + getYAxisPosition() ;
+                        xError =  targetXEncoder - xEncoder.getCurrentPosition();
+                        yError =  targetYEncoder  - yEncoder.getCurrentPosition();
                         Log.d("9010", "=====================");
-                        Log.d("9010", "X Positon: " + getXAxisPosition());
-                        Log.d("9010", "Y Positon: " + getYAxisPosition());
+                        Log.d("9010", "X Positon: " + xEncoder.getCurrentPosition());
+                        Log.d("9010", "Y Positon: " + yEncoder.getCurrentPosition());
 
                         double xVelocityCaculated = lnXPidfCrtler.calculate(xError) ;
                         if (xVelocityCaculated > (ANGULAR_RATE/2 )) {
