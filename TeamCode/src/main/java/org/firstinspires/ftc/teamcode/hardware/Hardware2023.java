@@ -219,7 +219,7 @@ public class Hardware2023 {
     /**
      * Initialize the AprilTag processor.
      */
-    private void initTfod() {
+    public void initTfod() {
 
         // Create the TensorFlow processor by using a builder.
         tfod = new TfodProcessor.Builder()
@@ -735,7 +735,7 @@ public class Hardware2023 {
                     double targetXEncoder =   xEncoder.getCurrentPosition() +  (initX + targetX) * xAxisCoeff;
                     Log.d("9010", "targetXEncoder: " +targetXEncoder );
                     double yError = 0;
-                    double targetYEncoder =  yEncoder.getCurrentPosition() + (initY - targetY) * yAxisCoeff ;
+                    double targetYEncoder =  yEncoder.getCurrentPosition() - (initY - targetY) * yAxisCoeff ;
                     Log.d("9010", "targetYEncoder: " +targetYEncoder );
                     double initHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
                     double turnError = 0;
@@ -743,10 +743,10 @@ public class Hardware2023 {
 
                     Log.d("9010", "Before entering Loop ===========");
 
-                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint()&& turnPidfCrtler.atSetPoint() )) {
+                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() )) {
 
-                        xError =  targetXEncoder - xEncoder.getCurrentPosition();
-                        yError =  targetYEncoder  - yEncoder.getCurrentPosition();
+                        xError =   xEncoder.getCurrentPosition() -targetXEncoder;
+                        yError =   yEncoder.getCurrentPosition() -targetYEncoder;
                         Log.d("9010", "=====================");
                         Log.d("9010", "X Positon: " + xEncoder.getCurrentPosition());
                         Log.d("9010", "Y Positon: " + yEncoder.getCurrentPosition());
@@ -880,26 +880,23 @@ public class Hardware2023 {
      * @return
      */
     public TeamPropPosition detectTeamProp (String targetTeamProp ) throws InterruptedException {
-        int left = 80;
+        int left = 50;
         int center = 300;
-        int right = 500;
+        int right = 520;
         TeamPropPosition foundPosition= null;
+        Log.d("9010", "Looking for Team Prop: " + targetTeamProp);
 
-        initTfod();
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
-        if (currentRecognitions.size()<1) {
-            //If can't find any object.
-            Log.d("9010", "Can't find object " + currentRecognitions.size());
-            Thread.sleep(1000);
+        long initMill = System.currentTimeMillis();
+        while (currentRecognitions.size()<1 && ( (System.currentTimeMillis() - initMill )<4000)  ) {
             currentRecognitions = tfod.getRecognitions();
-            if (currentRecognitions.size()<1) {
-                Log.d("9010", "Still Can't find object, " + currentRecognitions.size());
-                closeVisionPortal();
-                return TeamPropPosition.UNKOWN;
-            }
         }
 
+        if (currentRecognitions.size()<1) {
+            Log.d("9010", "Still Can't find object, " + currentRecognitions.size());
+            return TeamPropPosition.UNKOWN;
+        }
         // Find out the correct regconition.
         List<Recognition> filteredRec = new ArrayList<Recognition>();
         for (Recognition recognition : currentRecognitions) {
@@ -939,7 +936,7 @@ public class Hardware2023 {
             foundPosition = TeamPropPosition.RIGHT;
         }
 
-        closeVisionPortal();
+
         return foundPosition;
     }
 
