@@ -145,7 +145,7 @@ public class HWTestTele  extends LinearOpMode {
             }
 
             hdw.boxGate.setPosition(gamepad1.left_stick_x);
-            Log.d("9010", "Servo positon: " gamepad1.left_stick_x);
+            Log.d("9010", "Servo positon: " + gamepad1.left_stick_x);
 
         }
     }

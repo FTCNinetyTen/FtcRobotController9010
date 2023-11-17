@@ -73,6 +73,18 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
             } */
 
 
+            if (!previousGamePad1.left_bumper & currentGamePad1.left_bumper) {
+                hdw.intake.setPower(1);
+            }
+            if (previousGamePad1.left_bumper & !currentGamePad1.left_bumper) {
+                hdw.intake.setPower(0);
+            }
+            if (!previousGamePad1.right_bumper & currentGamePad1.right_bumper) {
+                hdw.intake.setPower(-0.5);
+            }
+            if (previousGamePad1.right_bumper & !currentGamePad1.right_bumper) {
+                hdw.intake.setPower(0);
+            }
 
             //This is to toggle the heading, by pushing the button y.
             if ( currentGamePad1.y && ! previousGamePad1.y  ) {
