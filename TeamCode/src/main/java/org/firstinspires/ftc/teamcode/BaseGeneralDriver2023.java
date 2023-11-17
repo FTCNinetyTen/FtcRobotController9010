@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
@@ -35,10 +36,19 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
         waitForStart();
         telemetry.clearAll();
 
-        //This is the main loop of operation.
+        Gamepad previousGamePad1 = new Gamepad();
+        Gamepad currentGamePad1 = new Gamepad();
+
+        //This is the main loop of operation
+        currentGamePad1.copy(gamepad1);
         while (opModeIsActive()) {
+            //Record previous Gamepad Status
+            previousGamePad1.copy(currentGamePad1);
+            //Update current gamepad status
+            currentGamePad1.copy(gamepad1);
 
             //Use DPad to move to according April tag
+            /* Commend out for 1st meet
             if (gamepad1.dpad_left) {
                 Log.d("9010", "alliance " + alliance);
                 if ( alliance.equals(BLUE)) {
@@ -60,15 +70,23 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
                 } else {
                     hdw.moveByAprilTag(6 , 12, 0);
                 }
-            }
+            } */
 
-            if (gamepad1.y) {
+            //This is to toggle the heading, by pushing the button y.
+            if ( currentGamePad1.y && ! previousGamePad1.y  ) {
                 if (robotWheel.isHeadingForward()) {
                     robotWheel.setHeadingForward(false);
                 } else {
                     robotWheel.setHeadingForward(true);
                 }
-                sleep(100);
+            }
+
+            //Open BOx on pushing down button
+            if ( currentGamePad1.b && ! previousGamePad1.b  ) {
+                hdw.openBox();
+            }
+            if ( !currentGamePad1.y &&  previousGamePad1.y  ) {
+                hdw.closeBox();
             }
 
             telemetry.clearAll();

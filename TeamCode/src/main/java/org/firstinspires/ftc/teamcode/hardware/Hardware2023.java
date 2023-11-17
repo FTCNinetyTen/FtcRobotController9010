@@ -57,6 +57,7 @@ public class Hardware2023 {
     public DcMotorEx xEncoder = null;
     public DcMotorEx vSlideM = null;
     public DcMotorEx vSlideS = null;
+    public DcMotor intake = null;
 
     //IMU
     public IMU imu = null;
@@ -171,7 +172,7 @@ public class Hardware2023 {
 
         xEncoder = hwMap.get(DcMotorEx.class, "dwX");
         yEncoder = hwMap.get(DcMotorEx.class, "dwY");
-
+        intake = hwMap.get(DcMotor.class, "intake");
 
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -213,6 +214,8 @@ public class Hardware2023 {
         // Now initialize the IMU with this mounting orientation
         // Note: if you choose two conflicting directions, this initialization will cause a code exception.
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+
+        boxGate = hwMap.get(Servo.class , "boxGate");
 
     }
 
@@ -869,8 +872,11 @@ public class Hardware2023 {
     }
 
     public void openBox () {
-         boxGate.setPosition(.5);
+         boxGate.setPosition(.3);
+    }
 
+    public  void  closeBox() {
+        boxGate.setPosition(0);
     }
 
 
@@ -943,5 +949,14 @@ public class Hardware2023 {
         return foundPosition;
     }
 
+    public void spitOutPixel () {
+        intake.setPower(-1) ;
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            telemetry.addData("Error sleeping", e.getMessage());
+        }
+        intake.setPower(0);
+    }
 
 }
