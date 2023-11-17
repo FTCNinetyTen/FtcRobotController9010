@@ -666,7 +666,7 @@ public class Hardware2023 {
      * @param targetX   horizontal shift to the center of april tag.  unit in inches.  Positive
      *                  means tag is on the right of robot camera.
      */
-    public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) throws InterruptedException {
+    public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  )  {
         //visionPortal.setProcessorEnabled(aprilTagProc,true);
         Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId );
         //Set motor to run in encoder mode, use angular velocity to control motor instead of power.
