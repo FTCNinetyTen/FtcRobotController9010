@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
 
 @TeleOp(name="HDWTestOp", group="TeleOps")
@@ -25,9 +29,15 @@ public class HWTestTele  extends LinearOpMode {
         waitForStart();
         telemetry.clearAll();
 
+        Gamepad previousGamePad1 = new Gamepad();
+        Gamepad currentGamePad1 = new Gamepad();
 
         //This is the main loop of operation.
         while (opModeIsActive()) {
+            //Record previous Gamepad Status
+            previousGamePad1.copy(currentGamePad1);
+            //Update current gamepad status
+            currentGamePad1.copy(gamepad1);
 
             if (gamepad1.dpad_left) {
                 hdw.setLnKP(pidCoffs[0]);
@@ -121,9 +131,21 @@ public class HWTestTele  extends LinearOpMode {
                 sleep(100);
             }
 
-            if (gamepad1.left_stick_button) {
-
+            if (!previousGamePad1.left_bumper & currentGamePad1.left_bumper) {
+                hdw.intake.setPower(1);
             }
+            if (previousGamePad1.left_bumper & !currentGamePad1.left_bumper) {
+                hdw.intake.setPower(0);
+            }
+            if (!previousGamePad1.right_bumper & currentGamePad1.right_bumper) {
+                hdw.intake.setPower(-0.5);
+            }
+            if (previousGamePad1.right_bumper & !currentGamePad1.right_bumper) {
+                hdw.intake.setPower(0);
+            }
+
+            hdw.boxGate.setPosition(gamepad1.left_stick_x);
+            Log.d("9010", "Servo positon: " gamepad1.left_stick_x);
 
         }
     }

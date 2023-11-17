@@ -72,6 +72,8 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
                 }
             } */
 
+
+
             //This is to toggle the heading, by pushing the button y.
             if ( currentGamePad1.y && ! previousGamePad1.y  ) {
                 if (robotWheel.isHeadingForward()) {
@@ -85,7 +87,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
             if ( currentGamePad1.b && ! previousGamePad1.b  ) {
                 hdw.openBox();
             }
-            if ( !currentGamePad1.y &&  previousGamePad1.y  ) {
+            if ( !currentGamePad1.x &&  previousGamePad1.x  ) {
                 hdw.closeBox();
             }
 

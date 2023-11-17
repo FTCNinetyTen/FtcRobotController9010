@@ -170,9 +170,10 @@ public class Hardware2023 {
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
         wheelBackLeft = hwMap.get(DcMotorEx.class, "lrWheel");
 
-        xEncoder = hwMap.get(DcMotorEx.class, "dwX");
-        yEncoder = hwMap.get(DcMotorEx.class, "dwY");
-        intake = hwMap.get(DcMotor.class, "intake");
+        xEncoder = hwMap.get(DcMotorEx.class, "xEncoder");
+        yEncoder = hwMap.get(DcMotorEx.class, "yEncoder");
+        yEncoder.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake = yEncoder;
 
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -205,10 +206,9 @@ public class Hardware2023 {
         //Get IMU.
         imu = hwMap.get(IMU.class, "imu");
 
-        //TODO: Update accordingly for the orientation of Control Hub.
         //Our robot mount Control hub Logo face backward, and USB port is facing Up.
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         // Now initialize the IMU with this mounting orientation
@@ -872,7 +872,7 @@ public class Hardware2023 {
     }
 
     public void openBox () {
-         boxGate.setPosition(.3);
+         boxGate.setPosition(1);
     }
 
     public  void  closeBox() {
