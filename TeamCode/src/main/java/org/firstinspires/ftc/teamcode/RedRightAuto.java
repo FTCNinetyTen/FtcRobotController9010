@@ -14,12 +14,12 @@ public class RedRightAuto extends BaseAuto {
 
 
     public RedRightAuto () {
-        targetTeamTP="RedTP";
+        targetTeamTP="Pixel";
     }
     void moveBeforeBoard() {
-        hdw.moveYAxis(12,1) ;
         hdw.moveXAxis(24,1) ;
-        hdw.turn(90);
+        hdw.moveYAxis(24,1) ;
+        hdw.turn(-90);
 
     }
 

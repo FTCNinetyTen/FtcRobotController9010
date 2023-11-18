@@ -41,7 +41,7 @@ public class Hardware2023 {
     private TfodProcessor tfod;
     private static final String TFOD_MODEL_ASSET = "9010.tflite";
     private static final String[] LABELS = {
-            "BlueTP","RedTP"
+            "Pixel"
     };
 
     //servos
@@ -232,7 +232,7 @@ public class Hardware2023 {
                 // choose one of the following:
                 //   Use setModelAssetName() if the custom TF Model is built in as an asset (AS only).
                 //   Use setModelFileName() if you have downloaded a custom team model to the Robot Controller.
-                .setModelAssetName(TFOD_MODEL_ASSET)
+                //.setModelAssetName(TFOD_MODEL_ASSET)
                 //.setModelFileName(TFOD_MODEL_FILE)
 
                 // The following default settings are available to un-comment and edit as needed to
@@ -746,7 +746,9 @@ public class Hardware2023 {
 
                     Log.d("9010", "Before entering Loop ===========");
 
-                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() )) {
+                    long initMill = System.currentTimeMillis();
+                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() )
+                           && (System.currentTimeMillis() - initMill ) < 5000) {
 
                         xError =   xEncoder.getCurrentPosition() -targetXEncoder;
                         yError =   yEncoder.getCurrentPosition() -targetYEncoder;
@@ -815,7 +817,6 @@ public class Hardware2023 {
         //set Integration between -0.5 to 0.5 to avoid saturating PID output.
         slidePID.setIntegrationBounds(-0.5 , 0.5 );
 
-
         double diff = vSlideM.getCurrentPosition() - vSlideS.getCurrentPosition();
 
         double calculatedVelocity = slidePID.calculate(diff)   ;
@@ -828,7 +829,7 @@ public class Hardware2023 {
 
         //Control 2 Vslide in Sync
         vSlideM.setVelocity(power * ANGULAR_RATE);
-        vSlideS.setVelocity(power *ANGULAR_RATE - calculatedVelocity );
+        vSlideS.setVelocity(power *ANGULAR_RATE );
         //vSlideS.setVelocity(power *ANGULAR_RATE );
 
     }
@@ -860,7 +861,7 @@ public class Hardware2023 {
         while (vSlideM.isBusy()) {
             vSlideM.setVelocity( sign * ANGULAR_RATE* 0.5 );
             vSlideS.setVelocity( sign * ANGULAR_RATE* 0.5 );
-            //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
+            Log.d("9010", "Inside Moving Loop : " + vSlideM.getCurrentPosition() + " Sign: " + sign);
         }
         vSlideM.setVelocity(0);
         vSlideS.setVelocity(0);

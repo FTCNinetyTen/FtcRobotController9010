@@ -47,8 +47,9 @@ public abstract class BaseAuto extends LinearOpMode {
         telemetry.update();
         hdw.closeVisionPortal();
 
+        hdw.initAprilTag();
         //2. Put purple pixel in place
-        putPurplePixel();
+        //putPurplePixel();
 
         //3. Move before the board
         moveBeforeBoard();
@@ -106,6 +107,11 @@ public abstract class BaseAuto extends LinearOpMode {
             }
         }
 
+        hdw.moveSlideToHeight(800);
         hdw.openBox();
+        sleep(1000);
+        hdw.closeBox();
+        hdw.moveSlideToHeight(0);
+        hdw.moveYAxis(6,1);
     }
 }

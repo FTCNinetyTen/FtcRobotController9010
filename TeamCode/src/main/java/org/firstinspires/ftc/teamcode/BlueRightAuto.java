@@ -8,10 +8,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class BlueRightAuto extends BaseAuto {
 
     public BlueRightAuto () {
-        targetTeamTP="BlueTP";
+        targetTeamTP="Pixel";
     }
     void moveBeforeBoard() {
-
+        sleep(10000);
+        hdw.moveXAxis(-72,1) ;
+        hdw.moveYAxis(24,1) ;
+        hdw.turn(90);
     }
 
 }

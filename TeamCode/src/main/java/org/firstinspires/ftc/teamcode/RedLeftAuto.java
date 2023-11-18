@@ -12,11 +12,14 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 public class RedLeftAuto extends BaseAuto {
 
     public RedLeftAuto () {
-        targetTeamTP="RedTP";
+        targetTeamTP="Pixel";
     }
 
     void moveBeforeBoard() {
-
+        sleep(10000);
+        hdw.moveXAxis(72,1) ;
+        hdw.moveYAxis(24,1) ;
+        hdw.turn(-90);
     }
 
 }

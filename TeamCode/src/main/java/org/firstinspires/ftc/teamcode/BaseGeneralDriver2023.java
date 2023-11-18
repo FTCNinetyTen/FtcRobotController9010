@@ -20,6 +20,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
     String alliance ;
     String BLUE="Blue";
     String RED="Red";
+    boolean intakePower = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -27,6 +28,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
         hdw.createHardware();
         robotWheel = new MecanumWheels();
         hdw.initAprilTag();
+
 
         double powerDrivePercentage = 0.55;
 
@@ -74,16 +76,23 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
 
 
             if (!previousGamePad1.left_bumper & currentGamePad1.left_bumper) {
-                hdw.intake.setPower(1);
+                if ( !intakePower ) {
+                    hdw.intake.setPower(1);
+                    intakePower = true;
+                } else {
+                    hdw.intake.setPower(0);
+                    intakePower = false ;
+                }
             }
-            if (previousGamePad1.left_bumper & !currentGamePad1.left_bumper) {
-                hdw.intake.setPower(0);
-            }
+
             if (!previousGamePad1.right_bumper & currentGamePad1.right_bumper) {
-                hdw.intake.setPower(-0.5);
-            }
-            if (previousGamePad1.right_bumper & !currentGamePad1.right_bumper) {
-                hdw.intake.setPower(0);
+                if ( !intakePower  ) {
+                    hdw.intake.setPower(-1);
+                    intakePower = true;
+                } else {
+                    hdw.intake.setPower(0);
+                    intakePower = false ;
+                }
             }
 
             //This is to toggle the heading, by pushing the button y.
@@ -107,7 +116,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
             telemetry.addData("[>]", "Robot Heading Forward: " + robotWheel.isHeadingForward());
             telemetry.update();
 
-            hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
+            hdw.freeMoveVerticalSlide(gamepad1.left_trigger - gamepad1.right_trigger);
 
             //Wheel takes input of gampad 1  ,  turbo is the power factor. Range 0-1 , 1 is 100%
             robotWheel.joystick(gamepad1, 1);
