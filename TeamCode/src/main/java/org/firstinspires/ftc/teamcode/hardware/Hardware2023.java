@@ -66,7 +66,7 @@ public class Hardware2023 {
     static public double ANGULAR_RATE = 2500.0;
 
     private final double xAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in X Axis
-    private final double yAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in Y Axis
+    private final double yAxisCoeff = 180 ;  // How many degrees encoder to turn to run an inch in Y Axis
 
     private boolean debug = true;
     private Telemetry telemetry;

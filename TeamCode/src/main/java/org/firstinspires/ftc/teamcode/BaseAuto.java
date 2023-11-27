@@ -55,7 +55,7 @@ public abstract class BaseAuto extends LinearOpMode {
         moveBeforeBoard();
 
         //4. Score Yellow Pixel
-        scoreYellow() ;
+        //scoreYellow() ;
 
         idle();
     }

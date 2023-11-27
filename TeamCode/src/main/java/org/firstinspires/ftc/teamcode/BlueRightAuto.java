@@ -12,9 +12,9 @@ public class BlueRightAuto extends BaseAuto {
     }
     void moveBeforeBoard() {
         sleep(10000);
-        hdw.moveXAxis(-72,1) ;
-        hdw.moveYAxis(24,1) ;
-        hdw.turn(90);
+        hdw.moveXAxis(-120,-1) ;
+        //hdw.moveYAxis(24,1) ;
+        //hdw.turn(90);
     }
 
 }
