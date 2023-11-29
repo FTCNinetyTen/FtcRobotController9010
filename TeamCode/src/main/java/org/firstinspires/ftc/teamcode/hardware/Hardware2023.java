@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -41,7 +40,7 @@ public class Hardware2023 {
     private TfodProcessor tfod;
     private static final String TFOD_MODEL_ASSET = "9010.tflite";
     private static final String[] LABELS = {
-            "Pixel"
+            "RedTP","BlueTP"
     };
 
     //servos
@@ -66,7 +65,7 @@ public class Hardware2023 {
     static public double ANGULAR_RATE = 2500.0;
 
     private final double xAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in X Axis
-    private final double yAxisCoeff = 180 ;  // How many degrees encoder to turn to run an inch in Y Axis
+    private final double yAxisCoeff = 216.5 ;  // How many degrees encoder to turn to run an inch in Y Axis
 
     private boolean debug = true;
     private Telemetry telemetry;
@@ -164,7 +163,6 @@ public class Hardware2023 {
      * Initialize hardware.
      */
     public void createHardware() {
-
         wheelFrontRight = hwMap.get(DcMotorEx.class, "rfWheel");
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
@@ -194,14 +192,13 @@ public class Hardware2023 {
         vSlideM = hwMap.get(DcMotorEx.class, "vSlideM");
         vSlideS = hwMap.get(DcMotorEx.class, "vSlideS");
         vSlideM.setDirection(DcMotorSimple.Direction.FORWARD);
-        vSlideM.setDirection(DcMotorSimple.Direction.REVERSE);
+        vSlideS.setDirection(DcMotorSimple.Direction.REVERSE);
 
         vSlideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         vSlideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         vSlideS.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         vSlideS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
 
         //Get IMU.
         imu = hwMap.get(IMU.class, "imu");
@@ -216,7 +213,6 @@ public class Hardware2023 {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         boxGate = hwMap.get(Servo.class , "boxGate");
-
     }
 
     /**
@@ -943,14 +939,13 @@ public class Hardware2023 {
             foundPosition = TeamPropPosition.RIGHT;
         }
 
-
         return foundPosition;
     }
 
     public void spitOutPixel () {
         intake.setPower(-1) ;
         try {
-            Thread.sleep(500);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             telemetry.addData("Error sleeping", e.getMessage());
         }

@@ -116,7 +116,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
             telemetry.addData("[>]", "Robot Heading Forward: " + robotWheel.isHeadingForward());
             telemetry.update();
 
-            hdw.freeMoveVerticalSlide(gamepad1.left_trigger - gamepad1.right_trigger);
+            hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
             //Wheel takes input of gampad 1  ,  turbo is the power factor. Range 0-1 , 1 is 100%
             robotWheel.joystick(gamepad1, 1);

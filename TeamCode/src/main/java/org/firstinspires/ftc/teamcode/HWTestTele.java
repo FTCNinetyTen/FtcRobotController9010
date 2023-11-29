@@ -132,16 +132,16 @@ public class HWTestTele  extends LinearOpMode {
             }
 
             if (!previousGamePad1.left_bumper & currentGamePad1.left_bumper) {
-                hdw.intake.setPower(1);
+                hdw.moveSlideToHeight(200);
             }
             if (previousGamePad1.left_bumper & !currentGamePad1.left_bumper) {
-                hdw.intake.setPower(0);
+                hdw.moveSlideToHeight(0);
             }
             if (!previousGamePad1.right_bumper & currentGamePad1.right_bumper) {
-                hdw.intake.setPower(-0.5);
+                hdw.moveSlideToHeight(500);
             }
             if (previousGamePad1.right_bumper & !currentGamePad1.right_bumper) {
-                hdw.intake.setPower(0);
+                hdw.moveSlideToHeight(0);
             }
 
             hdw.boxGate.setPosition(gamepad1.left_stick_x);

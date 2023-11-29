@@ -14,7 +14,7 @@ public class RedRightAuto extends BaseAuto {
 
 
     public RedRightAuto () {
-        targetTeamTP="Pixel";
+        targetTeamTP="RedTP";
     }
     void moveBeforeBoard() {
         hdw.moveXAxis(48,1) ;

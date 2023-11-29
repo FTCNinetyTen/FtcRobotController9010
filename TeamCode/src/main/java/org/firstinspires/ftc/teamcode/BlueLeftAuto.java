@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 public class BlueLeftAuto extends BaseAuto {
 
     public BlueLeftAuto () {
-        targetTeamTP="Pixel";
+        targetTeamTP="BlueTP";
     }
     void moveBeforeBoard() {
         hdw.moveXAxis(-48,-1) ;
