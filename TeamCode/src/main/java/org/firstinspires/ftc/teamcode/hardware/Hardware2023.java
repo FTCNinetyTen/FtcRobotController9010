@@ -663,6 +663,7 @@ public class Hardware2023 {
      *                  means tag is on the right of robot camera.
      */
     public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  )  {
+        double cameraRadius = 6.875 ;
         //visionPortal.setProcessorEnabled(aprilTagProc,true);
         Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId );
         //Set motor to run in encoder mode, use angular velocity to control motor instead of power.
@@ -701,6 +702,9 @@ public class Hardware2023 {
 
                     //1st We turn robot to elimiate the yaw.
                     turn( initYaw);
+                    //Componsate for the Y and X shift, becuase of turn
+                    initX += cameraRadius * Math.sin(initYaw);
+                    initY += cameraRadius * ( 1 - Math.cos(initYaw));
 
                     //Then move robot with X, and Y, to close in to april Tag.
 
@@ -726,7 +730,7 @@ public class Hardware2023 {
 
                     turnPidfCrtler.setSetPoint(0);
                     //Set tolerance as 0.5 degrees
-                    turnPidfCrtler.setTolerance(0.5);
+                    turnPidfCrtler.setTolerance(2);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     turnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
@@ -743,7 +747,7 @@ public class Hardware2023 {
                     Log.d("9010", "Before entering Loop ===========");
 
                     long initMill = System.currentTimeMillis();
-                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() )
+                    while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() &&turnPidfCrtler.atSetPoint() )
                            && (System.currentTimeMillis() - initMill ) < 5000) {
 
                         xError =   xEncoder.getCurrentPosition() -targetXEncoder;
@@ -794,7 +798,7 @@ public class Hardware2023 {
                     wheelBackRight.setVelocity(0);
                     wheelBackLeft.setVelocity(0);
                 } // if ( detection.id == tagId) {
-            } // for ( AprilTagDetection detection : currentDetections) {
+            } // for ( AprilTagDetection detectio  n : currentDetections) {
         } //End of  if (currentDetections.size()<1 )   {  } else
 
      //visionPortal.setProcessorEnabled(aprilTagProc,false);
