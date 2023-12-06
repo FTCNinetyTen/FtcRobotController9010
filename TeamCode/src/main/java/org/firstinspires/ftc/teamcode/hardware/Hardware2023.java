@@ -213,6 +213,7 @@ public class Hardware2023 {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         boxGate = hwMap.get(Servo.class , "boxGate");
+
     }
 
     /**

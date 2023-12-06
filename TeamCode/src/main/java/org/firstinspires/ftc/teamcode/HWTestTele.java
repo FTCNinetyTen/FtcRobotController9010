@@ -143,9 +143,16 @@ public class HWTestTele  extends LinearOpMode {
             if (previousGamePad1.right_bumper & !currentGamePad1.right_bumper) {
                 hdw.moveSlideToHeight(0);
             }
+            if (previousGamePad1.right_stick_button && !currentGamePad1.right_stick_button) {
+                hdw.closeBox();
+            }
+            if (!previousGamePad1.right_stick_button && currentGamePad1.right_stick_button) {
+                hdw.openBox();
+            }
 
-            hdw.boxGate.setPosition(gamepad1.left_stick_x);
-            Log.d("9010", "Servo positon: " + gamepad1.left_stick_x);
+
+            //hdw.boxGate.setPosition(gamepad1.left_stick_x);
+            //Log.d("9010", "Servo positon: " + gamepad1.left_stick_x);
 
         }
     }
