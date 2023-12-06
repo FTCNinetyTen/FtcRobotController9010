@@ -47,13 +47,15 @@ public abstract class BaseAuto extends LinearOpMode {
         telemetry.update();
         hdw.closeVisionPortal();
 
-        hdw.initAprilTag();
+
         //2. Put purple pixel in place
         putPurplePixel();
 
         //3. Move before the board
         moveBeforeBoard();
 
+
+        hdw.initAprilTag();
         //4. Score Yellow Pixel
         //scoreYellow() ;
 
@@ -68,7 +70,6 @@ public abstract class BaseAuto extends LinearOpMode {
         hdw.moveYAxis(8, 1);
 
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
-            hdw.moveYAxis(6,1);
             hdw.turn(-90);
             hdw.moveXAxis(-10, -1);
             hdw.spitOutPixel();
@@ -76,14 +77,12 @@ public abstract class BaseAuto extends LinearOpMode {
         }
 
         if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
-            hdw.moveYAxis(6,1);
             hdw.turn(90);
             hdw.moveXAxis(10, 1);
             hdw.spitOutPixel();
             hdw.turn(90);
         }
         if (detectedPosition.equals(TeamPropPosition.CENTER)) {
-            hdw.moveYAxis(6,1);
             hdw.turn(180);
             hdw.moveYAxis(-10, -1);
             hdw.spitOutPixel();
