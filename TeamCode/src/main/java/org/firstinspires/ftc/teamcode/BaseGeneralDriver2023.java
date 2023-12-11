@@ -86,13 +86,8 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
             }
 
             if (!previousGamePad1.right_bumper & currentGamePad1.right_bumper) {
-                if ( !intakePower  ) {
-                    hdw.intake.setPower(-1);
-                    intakePower = true;
-                } else {
-                    hdw.intake.setPower(0);
-                    intakePower = false ;
-                }
+                hdw.spitOutPixel();
+
             }
 
             //This is to toggle the heading, by pushing the button y.

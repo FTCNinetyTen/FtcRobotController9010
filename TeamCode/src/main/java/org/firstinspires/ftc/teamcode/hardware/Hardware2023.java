@@ -169,6 +169,7 @@ public class Hardware2023 {
         wheelBackLeft = hwMap.get(DcMotorEx.class, "lrWheel");
 
         xEncoder = hwMap.get(DcMotorEx.class, "xEncoder");
+        xEncoder.setDirection(DcMotorSimple.Direction.REVERSE);
         yEncoder = hwMap.get(DcMotorEx.class, "yEncoder");
         yEncoder.setDirection(DcMotorSimple.Direction.REVERSE);
         intake = yEncoder;
@@ -874,7 +875,7 @@ public class Hardware2023 {
     }
 
     public void openBox () {
-         boxGate.setPosition(1);
+         boxGate.setPosition(0.4);
     }
 
     public  void  closeBox() {
@@ -948,9 +949,9 @@ public class Hardware2023 {
     }
 
     public void spitOutPixel () {
-        intake.setPower(-1) ;
+        intake.setPower(-.8) ;
         try {
-            Thread.sleep(200);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             telemetry.addData("Error sleeping", e.getMessage());
         }
