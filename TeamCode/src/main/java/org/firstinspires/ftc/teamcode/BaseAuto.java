@@ -21,6 +21,7 @@ public abstract class BaseAuto extends LinearOpMode {
     String REDTP = "RedTP";
 
     abstract void moveBeforeBoard();
+    abstract void park ();
 
     TeamPropPosition detectedPosition = null;
 
@@ -51,8 +52,11 @@ public abstract class BaseAuto extends LinearOpMode {
         //2. Put purple pixel in place
         putPurplePixel();
 
+        //Park
+        park();
+
         //3. Move before the board
-        moveBeforeBoard();
+        //moveBeforeBoard();
 
 
         hdw.initAprilTag();
@@ -64,28 +68,46 @@ public abstract class BaseAuto extends LinearOpMode {
 
     /**
      * This method put purple pixel on the spark
-     * After doing this, robot shall facing backword.
+     *
      */
     private void putPurplePixel() {
-        hdw.moveYAxis(8, 1);
+        //Move forward 24 inches.
+        hdw.moveYAxis(26, 1);
 
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
+            //Turn left
+            hdw.turn(90);
+
+            //hdw.moveSlideToHeight(200);
+            hdw.openBox();
+            sleep(1000);
+            hdw.closeBox();
+            //hdw.moveSlideToHeight(0);
+            hdw.moveYAxis(-3,-1);
             hdw.turn(-90);
-            hdw.moveXAxis(-10, -1);
-            hdw.spitOutPixel();
-            hdw.turn(-90);
+            //hdw.moveXAxis(-2,-1);
         }
 
         if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
+            hdw.turn(-90);
+
+            //hdw.moveSlideToHeight(200);
+            hdw.openBox();
+            sleep(1000);
+            hdw.closeBox();
+            //hdw.moveSlideToHeight(0);
+            hdw.moveYAxis(-3,-1);
             hdw.turn(90);
-            hdw.moveXAxis(10, 1);
-            hdw.spitOutPixel();
-            hdw.turn(90);
+            //hdw.moveXAxis(2,1);
         }
         if (detectedPosition.equals(TeamPropPosition.CENTER)) {
-            hdw.turn(180);
-            hdw.moveYAxis(-10, -1);
-            hdw.spitOutPixel();
+            hdw.moveYAxis(5,1);
+            hdw.moveYAxis(-5,-1);
+            //hdw.moveSlideToHeight(200);
+            hdw.openBox();
+            sleep(1000);
+            hdw.closeBox();
+            //hdw.moveSlideToHeight(0);
         }
 
     }

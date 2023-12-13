@@ -40,7 +40,7 @@ public class Hardware2023 {
     private TfodProcessor tfod;
     private static final String TFOD_MODEL_ASSET = "9010.tflite";
     private static final String[] LABELS = {
-            "RedTP","BlueTP"
+            "BlueTP","RedTP"
     };
 
     //servos
@@ -170,10 +170,17 @@ public class Hardware2023 {
 
         xEncoder = hwMap.get(DcMotorEx.class, "xEncoder");
         xEncoder.setDirection(DcMotorSimple.Direction.REVERSE);
+        xEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         yEncoder = hwMap.get(DcMotorEx.class, "yEncoder");
         yEncoder.setDirection(DcMotorSimple.Direction.REVERSE);
+        yEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intake = yEncoder;
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -230,7 +237,7 @@ public class Hardware2023 {
                 // choose one of the following:
                 //   Use setModelAssetName() if the custom TF Model is built in as an asset (AS only).
                 //   Use setModelFileName() if you have downloaded a custom team model to the Robot Controller.
-                //.setModelAssetName(TFOD_MODEL_ASSET)
+                .setModelAssetName(TFOD_MODEL_ASSET)
                 //.setModelFileName(TFOD_MODEL_FILE)
 
                 // The following default settings are available to un-comment and edit as needed to
@@ -269,7 +276,7 @@ public class Hardware2023 {
         visionPortal = builder.build();
 
         // Set confidence threshold for TFOD recognitions, at any time.
-        tfod.setMinResultConfidence(0.75f);
+        tfod.setMinResultConfidence(0.77f);
 
         // Disable or re-enable the TFOD processor at any time.
         //visionPortal.setProcessorEnabled(tfod, true);
@@ -679,14 +686,19 @@ public class Hardware2023 {
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        xEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        xEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        yEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        yEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         //Start April Tag detection fo find tag, possible multiple tag in camera frame,
         //So result is a list.
         List<AprilTagDetection> currentDetections = aprilTagProc.getDetections();
         if (currentDetections.size()<1 ) {
             //No tag found, do nothing.
-            telemetry.addData("No AprilTags Detected ", currentDetections.size());
+            telemetry.addData("No AprilTags Detected, exit ", currentDetections.size());
             telemetry.update();
-            Log.d("9010", "No AprilTags Detected "  + tagId );
+            Log.d("9010", "No AprilTags Detected, Exit "  + tagId );
             //visionPortal.setProcessorEnabled(aprilTagProc,false);
             return;
         } else {
@@ -702,11 +714,14 @@ public class Hardware2023 {
                     double initYaw = detection.ftcPose.yaw;
                     Log.d("9010", "current Yaw " + initYaw);
 
-                    //1st We turn robot to elimiate the yaw.
+                    //1st We turn robot to make yaw 0
+                    Log.d("9010","Before Turning to make Yaw 0");
                     turn( initYaw);
+                    Log.d("9010","Turn compelted. ");
                     //Componsate for the Y and X shift, becuase of turn
-                    initX += cameraRadius * Math.sin(initYaw);
-                    initY += cameraRadius * ( 1 - Math.cos(initYaw));
+                    initX += cameraRadius * Math.sin( Math.toRadians(initYaw));
+                    initY += cameraRadius * ( 1 - Math.cos(Math.toRadians(initYaw)));
+                    Log.d("9010","Recalculated initX : " + initX + " initY: " + initY );
 
                     //Then move robot with X, and Y, to close in to april Tag.
 
@@ -720,19 +735,19 @@ public class Hardware2023 {
 
                     lnYPidfCrtler.setSetPoint(0);
                     //Set Y tolerance as 0.2 inches
-                    lnYPidfCrtler.setTolerance(50);
+                    lnYPidfCrtler.setTolerance(100);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     //lnYPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     lnXPidfCrtler.setSetPoint(0);
                     //Set X tolerance as 0.2 inches
-                    lnXPidfCrtler.setTolerance(50);
+                    lnXPidfCrtler.setTolerance(100);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     //lnXPidfCrtler.setIntegrationBounds(-1 , 1 );
 
                     turnPidfCrtler.setSetPoint(0);
                     //Set tolerance as 0.5 degrees
-                    turnPidfCrtler.setTolerance(2);
+                    turnPidfCrtler.setTolerance(5);
                     //set Integration between -0.5 to 0.5 to avoid saturating PID output.
                     turnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
@@ -746,7 +761,7 @@ public class Hardware2023 {
                     double turnError = 0;
                     double rx = 0;
 
-                    Log.d("9010", "Before entering Loop ===========");
+                    Log.d("9010", "======Before entering Loop ========\n\n");
 
                     long initMill = System.currentTimeMillis();
                     while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() &&turnPidfCrtler.atSetPoint() )
@@ -757,6 +772,12 @@ public class Hardware2023 {
                         Log.d("9010", "=====================");
                         Log.d("9010", "X Positon: " + xEncoder.getCurrentPosition());
                         Log.d("9010", "Y Positon: " + yEncoder.getCurrentPosition());
+
+                        if ( xEncoder.getCurrentPosition()== 0 && yEncoder.getCurrentPosition()==0) {
+                            Log.d("9010", "Encode both got 0 , break loop");
+
+                            break;
+                        }
 
                         double xVelocityCaculated = lnXPidfCrtler.calculate(xError) ;
                         if (xVelocityCaculated > (ANGULAR_RATE/2 )) {
@@ -781,7 +802,7 @@ public class Hardware2023 {
                         Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
 
                         turnError = regulateDegree( initHeading - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-                        rx = turnPidfCrtler.calculate(turnError)*50;
+                        rx = - turnPidfCrtler.calculate(turnError) * 100;
 
                         Log.d("9010", "Turn Error: " + turnError );
                         Log.d("9010", "Calculated rx:  " + rx );
@@ -875,7 +896,7 @@ public class Hardware2023 {
     }
 
     public void openBox () {
-         boxGate.setPosition(0.4);
+        boxGate.setPosition(0.4);
     }
 
     public  void  closeBox() {
@@ -893,12 +914,12 @@ public class Hardware2023 {
         int center = 300;
         int right = 520;
         TeamPropPosition foundPosition= null;
-        Log.d("9010", "Looking for Team Prop: " + targetTeamProp);
+        Log.d("9010", "Looking for Team Prop: " + targetTeamProp );
 
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         long initMill = System.currentTimeMillis();
-        while (currentRecognitions.size()<1 && ( (System.currentTimeMillis() - initMill )<4000)  ) {
+        while (currentRecognitions.size()<1 && ( (System.currentTimeMillis() - initMill )<6000)  ) {
             currentRecognitions = tfod.getRecognitions();
         }
 
@@ -910,8 +931,18 @@ public class Hardware2023 {
         List<Recognition> filteredRec = new ArrayList<Recognition>();
         for (Recognition recognition : currentRecognitions) {
             if (recognition.getLabel().equals(targetTeamProp)) {
+                Log.d("9010", "Found our target , " + recognition);
                 filteredRec.add(recognition);
+            } else {
+                Log.d("9010", "We found other object : " );
+                Log.d("9010", "Label: " + recognition.getLabel());
+                Log.d("9010","Confidence: " + recognition.getConfidence() );
             }
+        }
+
+        if ( filteredRec.size() < 1 ) {
+            Log.d("9010", "What's found is not our taget " );
+            return TeamPropPosition.UNKOWN;
         }
 
         class recComparator implements Comparator<Recognition> {
@@ -921,6 +952,7 @@ public class Hardware2023 {
             }
         }
         Collections.sort(filteredRec, new recComparator());
+        Log.d("9010", "After sorting recogonition.  ");
 
         for (Recognition recognition: filteredRec) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2;

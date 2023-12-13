@@ -43,7 +43,7 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveXAxis(-10.0, -.5);
+                hdw.moveXAxis(-5.0, -.5);
             }
             if (gamepad1.dpad_right) {
                 hdw.setLnKP(pidCoffs[0]);
@@ -57,7 +57,7 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveYAxis(10.0, .5);
+                hdw.moveYAxis(5.0, .5);
             }
             if (gamepad1.dpad_down) {
                 hdw.setLnKP(pidCoffs[0]);
@@ -131,6 +131,7 @@ public class HWTestTele  extends LinearOpMode {
                 sleep(100);
             }
 
+            /*
             if (!previousGamePad1.left_bumper & currentGamePad1.left_bumper) {
                 hdw.moveSlideToHeight(200);
             }
@@ -142,7 +143,8 @@ public class HWTestTele  extends LinearOpMode {
             }
             if (previousGamePad1.right_bumper & !currentGamePad1.right_bumper) {
                 hdw.moveSlideToHeight(0);
-            }
+            } */
+
             if (previousGamePad1.right_stick_button && !currentGamePad1.right_stick_button) {
                 hdw.closeBox();
             }
