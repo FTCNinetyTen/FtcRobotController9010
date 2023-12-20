@@ -72,9 +72,10 @@ public abstract class BaseAuto extends LinearOpMode {
      */
     private void putPurplePixel() {
         //Move forward 24 inches.
-        hdw.moveYAxis(26, 1);
 
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
+            hdw.moveYAxis(27, 1);
+
             //Turn left
             hdw.turn(90);
 
@@ -89,6 +90,8 @@ public abstract class BaseAuto extends LinearOpMode {
         }
 
         if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
+            hdw.moveYAxis(27, 1);
+
             hdw.turn(-90);
 
             //hdw.moveSlideToHeight(200);
@@ -101,6 +104,8 @@ public abstract class BaseAuto extends LinearOpMode {
             //hdw.moveXAxis(2,1);
         }
         if (detectedPosition.equals(TeamPropPosition.CENTER)) {
+            hdw.moveYAxis(26, 1);
+
             hdw.moveYAxis(5,1);
             hdw.moveYAxis(-5,-1);
             //hdw.moveSlideToHeight(200);

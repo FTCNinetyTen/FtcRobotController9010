@@ -85,6 +85,8 @@ public class Hardware2023 {
     private double slideKI = 0.03;
     private double slideKD = 0.001;
 
+    private double slideUpperLimit = 2000;
+
     public double getLnKF() {   return lnKF;    }
 
     public double getTurnKP() {
@@ -832,7 +834,8 @@ public class Hardware2023 {
      * @param power
      */
     public void freeMoveVerticalSlide(float power ) {
-
+        //double slidePosition  = vSlideM.getCurrentPosition();
+/*
         PIDController slidePID = new PIDController(slideKP, slideKI, slideKD);
         slidePID.setSetPoint(0);
         //Set tolerance as 0.5 degrees
@@ -849,11 +852,14 @@ public class Hardware2023 {
         if ( calculatedVelocity < -ANGULAR_RATE) {
             calculatedVelocity = -ANGULAR_RATE;
         }
-
+*/
         //Control 2 Vslide in Sync
-        vSlideM.setVelocity(power * ANGULAR_RATE);
-        vSlideS.setVelocity(power *ANGULAR_RATE );
+        //if ((power > 0 && slidePosition < 2000) || (power < 0 && slidePosition > 0)) {
+            vSlideM.setVelocity(power * ANGULAR_RATE);
+            vSlideS.setVelocity(power *ANGULAR_RATE );
+        //}
         //vSlideS.setVelocity(power *ANGULAR_RATE );
+        // Log.d("9010", "Slide positin " + vSlideM.getCurrentPosition());
 
     }
 
