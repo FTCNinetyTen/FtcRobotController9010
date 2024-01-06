@@ -38,7 +38,7 @@ public class Hardware2023 {
     private AprilTagProcessor aprilTagProc;
     private VisionPortal visionPortal;
     private TfodProcessor tfod;
-    private static final String TFOD_MODEL_ASSET = "9010.tflite";
+    private static final String TFOD_MODEL_ASSET = "9010_gear.tflite";
     private static final String[] LABELS = {
             "BlueTP","RedTP"
     };
