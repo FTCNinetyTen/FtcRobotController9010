@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels;
 
@@ -100,11 +101,15 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
             }
 
             //Open BOx on pushing down button
-            if ( currentGamePad1.b && ! previousGamePad1.b  ) {
-                hdw.openBox();
-            }
             if ( !currentGamePad1.x &&  previousGamePad1.x  ) {
-                hdw.closeBox();
+                if (hdw.isBoxOpen()){
+                    hdw.closeBox();
+                    hdw.setBoxOpen(false);
+                }
+                else {
+                    hdw.openBox();
+                    hdw.setBoxOpen(true);
+                }
             }
 
             telemetry.clearAll();

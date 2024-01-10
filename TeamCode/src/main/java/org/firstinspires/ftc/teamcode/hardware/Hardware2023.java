@@ -45,6 +45,7 @@ public class Hardware2023 {
 
     //servos
     public Servo boxGate = null;
+    public Servo droneLauncher = null;
 
 
     //motors
@@ -86,6 +87,16 @@ public class Hardware2023 {
     private double slideKD = 0.001;
 
     private double slideUpperLimit = 2000;
+
+    private boolean isBoxOpen = false;
+
+    public boolean isBoxOpen() {
+        return isBoxOpen;
+    }
+
+    public void setBoxOpen(boolean boxOpen) {
+        isBoxOpen = boxOpen;
+    }
 
     public double getLnKF() {   return lnKF;    }
 
@@ -415,7 +426,7 @@ public class Hardware2023 {
             Log.d("9010", "Current Position: " + currentPosition );
             Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
             double turnError = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- startHeading;
-            rx = turnPidfCrtler.calculate(turnError)*200;
+            rx = turnPidfCrtler.calculate(turnError)*100;
             Log.d("9010", "Turn Error: " + turnError );
             Log.d("9010", "Calculated rx:  " + rx );
 
@@ -540,7 +551,7 @@ public class Hardware2023 {
             Log.d("9010", "Current Position: " + currentPosition );
             Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
             double turnError = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- startHeading;
-            rx = turnPidfCrtler.calculate(turnError)*200;
+            rx = turnPidfCrtler.calculate(turnError)*100;
             Log.d("9010", "Turn Error: " + turnError );
             Log.d("9010", "Calculated rx:  " + rx );
 
@@ -901,14 +912,17 @@ public class Hardware2023 {
         vSlideS.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void openBox () {
-        boxGate.setPosition(0.4);
+    public void openBox() {
+        this.boxGate.setPosition(0.6);
+        telemetry.addLine("Box open");
+        telemetry.update();
     }
 
-    public  void  closeBox() {
-        boxGate.setPosition(0);
+    public void closeBox() {
+        this.boxGate.setPosition(0.3);
+        telemetry.addLine("Box closed");
+        telemetry.update();
     }
-
 
     /**
      * This method detect the posiiton of Team Prop
