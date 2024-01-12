@@ -89,6 +89,15 @@ public class Hardware2023 {
     private double slideUpperLimit = 2000;
 
     private boolean isBoxOpen = false;
+    private boolean isDroneReleased = false;
+
+    public boolean isDroneReleased() {
+        return isDroneReleased;
+    }
+
+    public void releaseDrone(boolean releaseDroneLauncher) {
+        isDroneReleased = releaseDroneLauncher;
+    }
 
     public boolean isBoxOpen() {
         return isBoxOpen;
@@ -234,7 +243,8 @@ public class Hardware2023 {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         boxGate = hwMap.get(Servo.class , "boxGate");
-
+        droneLauncher = hwMap.get(Servo.class,"droneLauncher");
+        droneLauncher.setPosition(0);
     }
 
     /**
@@ -922,6 +932,14 @@ public class Hardware2023 {
         this.boxGate.setPosition(0.3);
         telemetry.addLine("Box closed");
         telemetry.update();
+    }
+
+    public void releaseDroneLauncher() {
+        this.droneLauncher.setPosition(0);
+    }
+
+    public void resetDroneLauncher() {
+        this.droneLauncher.setPosition(1);
     }
 
     /**

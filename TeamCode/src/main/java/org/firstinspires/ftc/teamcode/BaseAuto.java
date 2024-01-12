@@ -72,6 +72,7 @@ public abstract class BaseAuto extends LinearOpMode {
      */
     private void putPurplePixel() {
         //Move forward 24 inches.
+        hdw.moveSlideToHeight(250);
 
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
             hdw.moveYAxis(27, 1);

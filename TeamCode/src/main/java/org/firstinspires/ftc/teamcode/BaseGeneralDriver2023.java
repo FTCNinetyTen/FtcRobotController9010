@@ -112,6 +112,20 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
                 }
             }
 
+
+            if ( !currentGamePad1.b &&  previousGamePad1.b  ) {
+                if (hdw.isDroneReleased()){
+                    hdw.releaseDroneLauncher();
+                    hdw.releaseDrone(false);
+                }
+                else {
+                    hdw.resetDroneLauncher();
+                    hdw.releaseDrone(true);
+                }
+            }
+
+
+
             telemetry.clearAll();
             telemetry.addData("[>]", "Robot Heading Forward: " + robotWheel.isHeadingForward());
             telemetry.update();
