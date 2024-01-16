@@ -116,6 +116,7 @@ public abstract class BaseAuto extends LinearOpMode {
             //hdw.moveSlideToHeight(0);
         }
 
+        hdw.moveSlideToHeight(0);
     }
 
     private void scoreYellow()  {

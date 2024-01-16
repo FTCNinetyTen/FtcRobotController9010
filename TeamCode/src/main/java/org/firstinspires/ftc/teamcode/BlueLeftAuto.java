@@ -24,8 +24,8 @@ public class BlueLeftAuto extends BaseAuto {
 
     void park ( ) {
         hdw.moveXAxis(-3,1);
-        hdw.moveYAxis(-22,-1);
-        hdw.moveXAxis(-38,1);
+        hdw.moveYAxis(-24,-1);
+        hdw.moveXAxis(-34,1);
     }
 
 }

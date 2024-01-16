@@ -19,8 +19,8 @@ public class BlueRightAuto extends BaseAuto {
 
     void park ( ) {
         hdw.moveXAxis(-3,1);
-        hdw.moveYAxis(-22,-1);
-        hdw.moveXAxis(-86,1);
+        hdw.moveYAxis(-24,-1);
+        hdw.moveXAxis(-80,1);
     }
 
 }
