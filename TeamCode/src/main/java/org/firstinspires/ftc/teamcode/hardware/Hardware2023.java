@@ -837,7 +837,7 @@ public class Hardware2023 {
                         Log.d("9010", "Calculated Y Velocity:  " + yVelocityCaculated );
 
                         turnError = regulateDegree( initHeading - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
-                        rx = - turnPidfCrtler.calculate(turnError) * 100;
+                        rx = - turnPidfCrtler.calculate(turnError) * 50;
 
                         Log.d("9010", "Turn Error: " + turnError );
                         Log.d("9010", "Calculated rx:  " + rx );

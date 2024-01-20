@@ -48,20 +48,19 @@ public abstract class BaseAuto extends LinearOpMode {
         telemetry.update();
         hdw.closeVisionPortal();
 
-
         //2. Put purple pixel in place
         putPurplePixel();
 
-        //Park
-        park();
-
         //3. Move before the board
-        //moveBeforeBoard();
-
+        moveBeforeBoard();
 
         hdw.initAprilTag();
         //4. Score Yellow Pixel
-        //scoreYellow() ;
+        scoreYellow() ;
+        hdw.closeVisionPortal();
+
+        //Park
+        //park();
 
         idle();
     }
@@ -71,49 +70,56 @@ public abstract class BaseAuto extends LinearOpMode {
      *
      */
     private void putPurplePixel() {
-        //Move forward 24 inches.
-        hdw.moveSlideToHeight(200);
 
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
-            hdw.moveYAxis(27, 1);
+            hdw.moveYAxis(25, 1);
 
-            //Turn left
+            //Turn right, as release is on the back of robot
+            hdw.turn(-90);
+
+            hdw.releasePixelHook();
+            sleep(500);
+            //move forward , to avoid hiting the pixel
+            hdw.moveYAxis(3,1);
+
+            //Turn Left , facing robot forward again.
             hdw.turn(90);
 
-            //hdw.moveSlideToHeight(200);
-            hdw.openBox();
-            sleep(1000);
-            hdw.closeBox();
-            //hdw.moveSlideToHeight(0);
-            hdw.moveYAxis(-3,-1);
-            hdw.turn(-90);
-            //hdw.moveXAxis(-2,-1);
         }
 
         if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
-            hdw.moveYAxis(27, 1);
+            hdw.moveYAxis(25, 1);
 
+            //Turn Left
+            hdw.turn(90);
+
+            hdw.releasePixelHook();
+            sleep(500);
+
+            //move forward , to avoid hiting the pixel
+            hdw.moveYAxis(3,1);
+
+            //Turn Right, facing Robot forward again.
             hdw.turn(-90);
 
-            //hdw.moveSlideToHeight(200);
-            hdw.openBox();
-            sleep(1000);
-            hdw.closeBox();
-            //hdw.moveSlideToHeight(0);
-            hdw.moveYAxis(-3,-1);
-            hdw.turn(90);
-            //hdw.moveXAxis(2,1);
         }
         if (detectedPosition.equals(TeamPropPosition.CENTER)) {
-            hdw.moveYAxis(26, 1);
-
-            hdw.moveYAxis(5,1);
+            //Move more , to clear the team Prep
+            hdw.moveYAxis(28, 1);
+            //Then Move back for the turn
             hdw.moveYAxis(-5,-1);
-            //hdw.moveSlideToHeight(200);
-            hdw.openBox();
-            sleep(1000);
-            hdw.closeBox();
-            //hdw.moveSlideToHeight(0);
+
+            //Turn 2 90, to slow down.
+            hdw.turn(90);
+            sleep(500);
+            hdw.turn(90);
+
+            hdw.releasePixelHook();
+            hdw.moveYAxis(1,1 );
+            sleep(500);
+
+            //Turn facing Robot forward again.
+            hdw.turn(180);
         }
 
         hdw.moveSlideToHeight(0);
@@ -123,31 +129,34 @@ public abstract class BaseAuto extends LinearOpMode {
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
 
             if (targetTeamTP.equals(BLUETP) ) {
-                hdw.moveByAprilTag(1, 4, 0 );
+                hdw.moveByAprilTag(1, 18, 0 );
             } else {
-                hdw.moveByAprilTag(4, 4 , 0);
+                hdw.moveByAprilTag(4, 18 , 0);
             }
         } else  if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
 
             if (targetTeamTP.equals(BLUETP) ) {
-                hdw.moveByAprilTag(3, 4, 0 );
+                hdw.moveByAprilTag(3, 18, 0 );
             } else {
-                hdw.moveByAprilTag(6, 4 , 0);
+                hdw.moveByAprilTag(6, 18 , 0);
             }
 
         } else    if (detectedPosition.equals(TeamPropPosition.CENTER)) {
             if (targetTeamTP.equals(BLUETP) ) {
-                hdw.moveByAprilTag(2, 4, 0 );
+                hdw.moveByAprilTag(2, 18, 0 );
             } else {
-                hdw.moveByAprilTag(5, 4 , 0);
+                hdw.moveByAprilTag(5, 18 , 0);
             }
         }
 
-        hdw.moveSlideToHeight(800);
+        hdw.moveYAxis(6,1);
+        hdw.moveYAxis(4,1);
+        hdw.moveXAxis(2,1);
+        hdw.moveSlideToHeight(1000);
         hdw.openBox();
         sleep(1000);
         hdw.closeBox();
-        hdw.moveSlideToHeight(0);
-        hdw.moveYAxis(6,1);
+        hdw.moveSlideToHeight(100);
+
     }
 }

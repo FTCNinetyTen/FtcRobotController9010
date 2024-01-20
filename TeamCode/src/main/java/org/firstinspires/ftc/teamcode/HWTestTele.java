@@ -49,7 +49,7 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveXAxis(24.0, .5);
+                hdw.moveXAxis(4.0, .5);
             }
             if (gamepad1.dpad_up) {
                 telemetry.addLine().addData("[moving y >]  ", " Y ");
@@ -71,14 +71,14 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveByAprilTag(4 , 12, -1);
+                hdw.moveByAprilTag(4 , 18, -1);
             }
 
             if ( gamepad1.b) {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveByAprilTag(5 , 12, 1);
+                hdw.moveByAprilTag(5 , 18, 1);
             }
 
             if( gamepad1.x) {
