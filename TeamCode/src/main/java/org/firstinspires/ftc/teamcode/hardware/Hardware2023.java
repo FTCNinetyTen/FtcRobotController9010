@@ -46,7 +46,7 @@ public class Hardware2023 {
     //servos
     public Servo boxGate = null;
     public Servo droneLauncher = null;
-
+    public Servo pixelHook = null;
 
     //motors
     public DcMotorEx wheelFrontRight = null;
@@ -90,17 +90,26 @@ public class Hardware2023 {
 
     private boolean isBoxOpen = false;
     private boolean isDroneReleased = false;
+    private boolean isPixHookUp = true;
 
     public boolean isDroneReleased() {
         return isDroneReleased;
     }
 
-    public void releaseDrone(boolean releaseDroneLauncher) {
-        isDroneReleased = releaseDroneLauncher;
-    }
-
     public boolean isBoxOpen() {
         return isBoxOpen;
+    }
+
+    public void setDroneReleased(boolean droneReleased) {
+        isDroneReleased = droneReleased;
+    }
+
+    public boolean isPixHookUp() {
+        return isPixHookUp;
+    }
+
+    public void setPixHookUp(boolean pixHookUp) {
+        isPixHookUp = pixHookUp;
     }
 
     public void setBoxOpen(boolean boxOpen) {
@@ -245,6 +254,9 @@ public class Hardware2023 {
         boxGate = hwMap.get(Servo.class , "boxGate");
         droneLauncher = hwMap.get(Servo.class,"droneLauncher");
         droneLauncher.setPosition(0);
+        pixelHook = hwMap.get(Servo.class,"pixelHook");
+        pixelHook.setPosition(0);
+
     }
 
     /**
@@ -940,6 +952,14 @@ public class Hardware2023 {
 
     public void resetDroneLauncher() {
         this.droneLauncher.setPosition(1);
+    }
+
+    public void releasePixelHook ( ) {
+        this.pixelHook.setPosition(0.8);
+    }
+
+    public void resetPixelHook () {
+        this.pixelHook.setPosition(0);
     }
 
     /**
