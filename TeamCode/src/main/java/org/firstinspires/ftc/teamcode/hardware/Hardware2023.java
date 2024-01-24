@@ -867,7 +867,9 @@ public class Hardware2023 {
      * @param power
      */
     public void freeMoveVerticalSlide(float power ) {
-        //double slidePosition  = vSlideM.getCurrentPosition();
+        double slidePosition  = vSlideM.getCurrentPosition();
+        Log.d("9010", "Slide Hight: " + slidePosition );
+        Log.d("9010", "Power input: " + power );
 /*
         PIDController slidePID = new PIDController(slideKP, slideKI, slideKD);
         slidePID.setSetPoint(0);
@@ -887,12 +889,13 @@ public class Hardware2023 {
         }
 */
         //Control 2 Vslide in Sync
-        //if ((power > 0 && slidePosition < 2000) || (power < 0 && slidePosition > 0)) {
+        if ((power > 0 && slidePosition < 2000) || (power < 0 && slidePosition > 0)) {
             vSlideM.setVelocity(power * ANGULAR_RATE);
             vSlideS.setVelocity(power *ANGULAR_RATE );
-        //}
-        //vSlideS.setVelocity(power *ANGULAR_RATE );
-        // Log.d("9010", "Slide positin " + vSlideM.getCurrentPosition());
+        } else {
+            vSlideM.setVelocity(0);
+            vSlideS.setVelocity(0);
+        }
 
     }
 
@@ -955,10 +958,12 @@ public class Hardware2023 {
     }
 
     public void releasePixelHook ( ) {
+        Log.d("9010", "Release Pix Hook");
         this.pixelHook.setPosition(0.8);
     }
 
     public void resetPixelHook () {
+        Log.d("9010", "reset  Pix Hook");
         this.pixelHook.setPosition(0);
     }
 

@@ -123,6 +123,9 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
                 }
             }
 
+            if ( !currentGamePad1.a &&  previousGamePad1.a  ) {
+               hdw.moveSlideToHeight(1500);
+            }
 
 
             telemetry.clearAll();
