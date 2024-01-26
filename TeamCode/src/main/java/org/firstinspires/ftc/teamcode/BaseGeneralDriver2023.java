@@ -28,7 +28,6 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
         hdw = new Hardware2023(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
         robotWheel = new MecanumWheels();
-        hdw.initAprilTag();
 
         double powerDrivePercentage = 0.55;
 

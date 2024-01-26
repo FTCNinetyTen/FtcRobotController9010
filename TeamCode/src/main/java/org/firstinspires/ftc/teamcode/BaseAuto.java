@@ -29,7 +29,7 @@ public abstract class BaseAuto extends LinearOpMode {
     public void runOpMode() {
         hdw = new Hardware2023(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
-        hdw.initTfod();
+        hdw.initVision();
 
         waitForStart();
 
@@ -54,7 +54,6 @@ public abstract class BaseAuto extends LinearOpMode {
         //3. Move before the board
         moveBeforeBoard();
 
-        hdw.initAprilTag();
         //4. Score Yellow Pixel
         scoreYellow() ;
 
@@ -155,10 +154,10 @@ public abstract class BaseAuto extends LinearOpMode {
             }
         }
 
+        hdw.moveYAxis(8,1);
         hdw.moveYAxis(6,1);
-        hdw.moveYAxis(6,1);
-        hdw.moveXAxis(2,1);
-        hdw.moveSlideToHeight(1200);
+        hdw.moveYAxis(2,1);
+        hdw.moveSlideToHeight(1500);
         hdw.openBox();
         sleep(1000);
         hdw.closeBox();
