@@ -24,6 +24,9 @@ public class HWTestTele  extends LinearOpMode {
         telemetry.addData("[>]", "All set?");
         telemetry.update();
         //Initialize April Tag
+        hdw.initTfod();
+        hdw.disableTFOD();
+
         hdw.initAprilTag();
 
         waitForStart();

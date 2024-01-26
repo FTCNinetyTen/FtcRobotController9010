@@ -36,8 +36,10 @@ public class Hardware2023 {
 
     public HardwareMap hwMap;
     private AprilTagProcessor aprilTagProc;
-    private VisionPortal visionPortal;
+    private VisionPortal visionPortalTFOD;
     private TfodProcessor tfod;
+    private VisionPortal visionPortalAprilTag;
+
     private static final String TFOD_MODEL_ASSET = "9010_gear.tflite";
     private static final String[] LABELS = {
             "BlueTP","RedTP"
@@ -253,7 +255,7 @@ public class Hardware2023 {
 
         boxGate = hwMap.get(Servo.class , "boxGate");
         droneLauncher = hwMap.get(Servo.class,"droneLauncher");
-        droneLauncher.setPosition(0);
+        droneLauncher.setPosition(1);
         pixelHook = hwMap.get(Servo.class,"pixelHook");
         pixelHook.setPosition(0);
 
@@ -308,7 +310,7 @@ public class Hardware2023 {
         builder.addProcessor(tfod);
 
         // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
+        visionPortalTFOD = builder.build();
 
         // Set confidence threshold for TFOD recognitions, at any time.
         tfod.setMinResultConfidence(0.77f);
@@ -319,8 +321,8 @@ public class Hardware2023 {
         // end method initTfod()
 
     }
-    public void closeVisionPortal (){
-        visionPortal.close();
+    public void disableTFOD (){
+        visionPortalTFOD.close();
     }
 
     public  void initAprilTag() {
@@ -353,7 +355,7 @@ public class Hardware2023 {
         visionPortalBuilder.addProcessor(aprilTagProc);
 
         // Build the Vision Portal, using the above settings.
-        visionPortal = visionPortalBuilder.build();
+        visionPortalAprilTag = visionPortalBuilder.build();
 
         // Disable or re-enable the aprilTag processor at any time.
         //visionPortal.setProcessorEnabled(aprilTag, true);
@@ -443,19 +445,19 @@ public class Hardware2023 {
                 velocityCaculated = -ANGULAR_RATE/2;
             }
 
-            Log.d("9010", "=====================");
-            Log.d("9010", "Difference: " + difference);
-            Log.d("9010", "Current Position: " + currentPosition );
-            Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
+            //Log.d("9010", "=====================");
+            //Log.d("9010", "Difference: " + difference);
+            //Log.d("9010", "Current Position: " + currentPosition );
+            //Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
             double turnError = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- startHeading;
             rx = turnPidfCrtler.calculate(turnError)*100;
-            Log.d("9010", "Turn Error: " + turnError );
-            Log.d("9010", "Calculated rx:  " + rx );
+            //Log.d("9010", "Turn Error: " + turnError );
+            //Log.d("9010", "Calculated rx:  " + rx );
 
             double xError = xEncoder.getCurrentPosition() - currenXPosition;
-            Log.d("9010", "X Error " + xError);
+            //Log.d("9010", "X Error " + xError);
             xVelocity = lnXPidfCrtler.calculate(xError);
-            Log.d("9010", "X Velocity:  " + xVelocity);
+            //Log.d("9010", "X Velocity:  " + xVelocity);
 
             wheelFrontLeft.setVelocity(velocityCaculated + rx - xVelocity);
             wheelBackLeft.setVelocity(velocityCaculated + rx+ xVelocity);
@@ -568,19 +570,19 @@ public class Hardware2023 {
                 velocityCaculated = -ANGULAR_RATE/2;
             }
 
-            Log.d("9010", "=====================");
-            Log.d("9010", "Difference: " + difference);
-            Log.d("9010", "Current Position: " + currentPosition );
-            Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
+            //Log.d("9010", "=====================");
+            //Log.d("9010", "Difference: " + difference);
+            //Log.d("9010", "Current Position: " + currentPosition );
+            //Log.d("9010", "Calculated Velocity:  " + velocityCaculated );
             double turnError = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)- startHeading;
             rx = turnPidfCrtler.calculate(turnError)*100;
-            Log.d("9010", "Turn Error: " + turnError );
-            Log.d("9010", "Calculated rx:  " + rx );
+            //Log.d("9010", "Turn Error: " + turnError );
+            //Log.d("9010", "Calculated rx:  " + rx );
 
             double yError = yEncoder.getCurrentPosition() - currentYPosition;
-            Log.d("9010", "Y Error " + yError);
+            //Log.d("9010", "Y Error " + yError);
             yVelocity = lnYPidfCrtler.calculate(yError);
-            Log.d("9010", "Y Vel:  " + yVelocity);
+            //Log.d("9010", "Y Vel:  " + yVelocity);
 
             wheelFrontLeft.setVelocity(-velocityCaculated + rx + yVelocity);
             wheelBackLeft.setVelocity(velocityCaculated + rx+ yVelocity);
@@ -868,8 +870,8 @@ public class Hardware2023 {
      */
     public void freeMoveVerticalSlide(float power ) {
         double slidePosition  = vSlideM.getCurrentPosition();
-        Log.d("9010", "Slide Hight: " + slidePosition );
-        Log.d("9010", "Power input: " + power );
+        //Log.d("9010", "Slide Hight: " + slidePosition );
+        //Log.d("9010", "Power input: " + power );
 /*
         PIDController slidePID = new PIDController(slideKP, slideKI, slideKD);
         slidePID.setSetPoint(0);
@@ -926,7 +928,7 @@ public class Hardware2023 {
         while (vSlideM.isBusy()) {
             vSlideM.setVelocity( sign * ANGULAR_RATE* 0.5 );
             vSlideS.setVelocity( sign * ANGULAR_RATE* 0.5 );
-            Log.d("9010", "Inside Moving Loop : " + vSlideM.getCurrentPosition() + " Sign: " + sign);
+            //Log.d("9010", "Inside Moving Loop : " + vSlideM.getCurrentPosition() + " Sign: " + sign);
         }
         vSlideM.setVelocity(0);
         vSlideS.setVelocity(0);

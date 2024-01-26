@@ -17,11 +17,11 @@ public class BlueLeftAuto extends BaseAuto {
     }
     void moveBeforeBoard() {
         //Move Back for the drive before the board
-        hdw.moveYAxis(-24,-1) ;
+        hdw.moveYAxis(-22,-1) ;
         //Move left
         hdw.moveXAxis(-24,1) ;
         //Move Forward,
-        hdw.moveYAxis(24, 1);
+        hdw.moveYAxis(18, 1);
         //Turn left
         hdw.turn(90);
     }

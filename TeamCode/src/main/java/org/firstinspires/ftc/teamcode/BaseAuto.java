@@ -46,7 +46,7 @@ public abstract class BaseAuto extends LinearOpMode {
         Log.d("9010", "Detected: " + detectedPosition);
         telemetry.addData("[>]", "Detected:  " + detectedPosition);
         telemetry.update();
-        hdw.closeVisionPortal();
+        hdw.disableTFOD();
 
         //2. Put purple pixel in place
         putPurplePixel();
@@ -57,7 +57,7 @@ public abstract class BaseAuto extends LinearOpMode {
         hdw.initAprilTag();
         //4. Score Yellow Pixel
         scoreYellow() ;
-        hdw.closeVisionPortal();
+
 
         //Park
         //park();
@@ -129,30 +129,36 @@ public abstract class BaseAuto extends LinearOpMode {
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
 
             if (targetTeamTP.equals(BLUETP) ) {
+                Log.d("9010", "move to april tag 1 ");
                 hdw.moveByAprilTag(1, 18, 0 );
             } else {
+                Log.d("9010", "move to april tag 4 ");
                 hdw.moveByAprilTag(4, 18 , 0);
             }
         } else  if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
 
             if (targetTeamTP.equals(BLUETP) ) {
+                Log.d("9010", "move to april tag 3 ");
                 hdw.moveByAprilTag(3, 18, 0 );
             } else {
+                Log.d("9010", "move to april tag 6 ");
                 hdw.moveByAprilTag(6, 18 , 0);
             }
 
         } else    if (detectedPosition.equals(TeamPropPosition.CENTER)) {
             if (targetTeamTP.equals(BLUETP) ) {
+                Log.d("9010", "move to april tag 2 ");
                 hdw.moveByAprilTag(2, 18, 0 );
             } else {
+                Log.d("9010", "move to april tag 5 ");
                 hdw.moveByAprilTag(5, 18 , 0);
             }
         }
 
         hdw.moveYAxis(6,1);
-        hdw.moveYAxis(4,1);
+        hdw.moveYAxis(6,1);
         hdw.moveXAxis(2,1);
-        hdw.moveSlideToHeight(1000);
+        hdw.moveSlideToHeight(1200);
         hdw.openBox();
         sleep(1000);
         hdw.closeBox();

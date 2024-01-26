@@ -113,13 +113,14 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
 
 
             if ( !currentGamePad1.b && ( previousGamePad1.b && previousGamePad1.back)  ) {
+                Log.d("9010", "release and reset drone" + hdw.isDroneReleased());
                 if (hdw.isDroneReleased()){
                     hdw.releaseDroneLauncher();
                     hdw.setDroneReleased(false);
                 }
                 else {
                     hdw.resetDroneLauncher();
-                    hdw.setPixHookUp(true);
+                    hdw.setDroneReleased(true);
                 }
             }
 
