@@ -57,7 +57,7 @@ public abstract class BaseAuto extends LinearOpMode {
         //4. Score Yellow Pixel
         scoreYellow() ;
 
-
+        hdw.resetPixelHook();
         //Park
         //park();
 
@@ -104,7 +104,7 @@ public abstract class BaseAuto extends LinearOpMode {
         }
         if (detectedPosition.equals(TeamPropPosition.CENTER)) {
             //Move more , to clear the team Prep
-            hdw.moveYAxis(28, 1);
+            hdw.moveYAxis(32, 1);
             //Then Move back for the turn
             hdw.moveYAxis(-5,-1);
 
@@ -112,6 +112,9 @@ public abstract class BaseAuto extends LinearOpMode {
             hdw.turn(90);
             sleep(500);
             hdw.turn(90);
+
+            sleep(1000);
+            hdw.moveYAxis(-2, -1);
 
             hdw.releasePixelHook();
             hdw.moveYAxis(1,1 );
@@ -121,7 +124,7 @@ public abstract class BaseAuto extends LinearOpMode {
             hdw.turn(180);
         }
 
-        hdw.moveSlideToHeight(0);
+        //hdw.moveSlideToHeight(0);
     }
 
     private void scoreYellow()  {
@@ -155,7 +158,7 @@ public abstract class BaseAuto extends LinearOpMode {
         }
 
         hdw.moveYAxis(8,1);
-        hdw.moveYAxis(6,1);
+        hdw.moveYAxis(8,1);
         hdw.moveYAxis(2,1);
         hdw.moveSlideToHeight(1500);
         hdw.openBox();

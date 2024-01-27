@@ -16,7 +16,8 @@ public class RedLeftAuto extends BaseAuto {
     }
 
     void moveBeforeBoard() {
-        //Move Back for the drive before the board
+                //Move Back for the drive before the board
+        sleep(5000);
         hdw.moveYAxis(-24,-1) ;
         //Move Right
         hdw.moveXAxis(72,1) ;
@@ -24,6 +25,7 @@ public class RedLeftAuto extends BaseAuto {
         hdw.moveYAxis(24, 1);
         //Turn right
         hdw.turn(-90);
+
     }
 
     void park ( ) {

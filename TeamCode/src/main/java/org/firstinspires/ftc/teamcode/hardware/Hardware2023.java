@@ -284,7 +284,7 @@ public class Hardware2023 {
         //builder.setAutoStopLiveView(false);
         // Create the AprilTag processor.
         aprilTagProc = new AprilTagProcessor.Builder()
-                .setLensIntrinsics(1516.76, 1516.76, 950.833, 533.379)
+                //.setLensIntrinsics(1516.76, 1516.76, 950.833, 533.379)
                 .build();
         // Set and enable the processor.
         visionPortalBuilder.addProcessor(aprilTagProc);
@@ -413,7 +413,7 @@ public class Hardware2023 {
         long initMill = System.currentTimeMillis();
 
         while ( !(lnPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() )
-                && ( (System.currentTimeMillis() -initMill  )<5000)  ) {
+                && ( (System.currentTimeMillis() -initMill  )<4000)  ) {
             currentPosition = yEncoder.getCurrentPosition();
             //Calculate new distance
             difference = currentPosition - targetPosition;
