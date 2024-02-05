@@ -263,6 +263,7 @@ public class Hardware2023 {
     /**
      * Initialize the AprilTag processor.
      */
+    /*
     public void initVision () {
 
 
@@ -337,12 +338,17 @@ public class Hardware2023 {
         // end method initTfod()
 
 
+
+     */
+
+    /*
     }
+
     public void disableTFOD (){
         visionPortal.setProcessorEnabled(tfod, false);
 
     }
-
+*/
 
     /**
      * This operation move robot forward/backward according to the input

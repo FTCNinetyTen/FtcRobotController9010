@@ -144,7 +144,7 @@ public class Hardware2022 {
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
         wheelBackLeft = hwMap.get(DcMotorEx.class, "lrWheel");
-        vSlide = hwMap.get(DcMotorEx.class, "Vertical");
+        vSlide = hwMap.get(DcMotorEx.class, "vSlideM");
         xEncoder = hwMap.get(DcMotorEx.class, "xEncoder");
         yEncoder = hwMap.get(DcMotorEx.class, "yEncoder");
 
@@ -193,7 +193,6 @@ public class Hardware2022 {
         // Now initialize the IMU with this mounting orientation
         // Note: if you choose two conflicting directions, this initialization will cause a code exception.
         imu.initialize(new IMU.Parameters(orientationOnRobot));
-
 
     }
 

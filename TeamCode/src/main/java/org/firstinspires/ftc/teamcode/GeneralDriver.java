@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels;
 
-//@TeleOp(name="GeneralDriver2022", group="TeleOps")
-@Disabled
+@TeleOp(name="GeneralDriver2022", group="TeleOps")
+
 public class GeneralDriver extends LinearOpMode {
 
     private boolean debug = true;
@@ -31,7 +31,6 @@ public class GeneralDriver extends LinearOpMode {
 
         waitForStart();
         telemetry.clearAll();
-
 
         //This is the main loop of operation.
         while (opModeIsActive()) {
@@ -65,7 +64,7 @@ public class GeneralDriver extends LinearOpMode {
                  */
 
             }
-                //hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
+                hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
                 //Wheel takes input of gampad 1  ,  turbo is the power factor. Range 0-1 , 1 is 100%
                 robotWheel.joystick(gamepad1, 1);

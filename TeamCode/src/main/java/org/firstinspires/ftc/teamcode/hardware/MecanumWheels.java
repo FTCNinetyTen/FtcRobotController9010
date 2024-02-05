@@ -46,11 +46,12 @@ public class MecanumWheels {
 
         double x ,y ;
         if ( isHeadingForward ) {
+            //2024 02 03, change for demo robot.
             x  =  gamepad1.left_stick_x;
-            y= gamepad1.left_stick_y;
+            y= -gamepad1.left_stick_y;
         } else {
             x = - gamepad1.left_stick_x;
-            y =  -  gamepad1.left_stick_y;
+            y =    gamepad1.left_stick_y;
         }
 
         double rx = gamepad1.right_stick_x;
@@ -59,7 +60,6 @@ public class MecanumWheels {
         wheelBackLeftPower    = y + x - rx;
         wheelFrontRightPower  = y + x + rx;
         wheelBackRightPower   = y - x + rx;
-
 
         double max = Math.max(Math.abs(wheelFrontRightPower), Math.max(Math.abs(wheelBackRightPower),
                 Math.max(Math.abs(wheelFrontLeftPower), Math.abs(wheelBackLeftPower))));
