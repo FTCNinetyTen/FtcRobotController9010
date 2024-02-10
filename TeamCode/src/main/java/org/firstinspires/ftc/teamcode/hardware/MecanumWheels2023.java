@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
  * This fits for the wheel configuration of :
  *   The wheels need to form an "X" configuration
  */
-public class MecanumWheels {
+public class MecanumWheels2023 {
 
     //Initialize wheel motor power to 0
     public double wheelFrontRightPower = 0;
@@ -19,7 +19,7 @@ public class MecanumWheels {
 
     public double turbo = 0;
 
-    public MecanumWheels(){ }
+    public MecanumWheels2023(){ }
 
     /**
      * If ture, heading is in front.  other wise, robot heading is reversed.
@@ -46,12 +46,11 @@ public class MecanumWheels {
 
         double x ,y ;
         if ( isHeadingForward ) {
-            //2024 02 03, change for demo robot.
             x  =  gamepad1.left_stick_x;
-            y= -gamepad1.left_stick_y;
+            y  = -gamepad1.left_stick_y;
         } else {
             x = - gamepad1.left_stick_x;
-            y =    gamepad1.left_stick_y;
+            y =  gamepad1.left_stick_y;
         }
 
         double rx = gamepad1.right_stick_x;

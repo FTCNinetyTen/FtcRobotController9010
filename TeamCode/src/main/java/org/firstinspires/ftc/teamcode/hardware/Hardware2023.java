@@ -263,7 +263,7 @@ public class Hardware2023 {
     /**
      * Initialize the AprilTag processor.
      */
-    /*
+
     public void initVision () {
 
 
@@ -285,7 +285,7 @@ public class Hardware2023 {
         //builder.setAutoStopLiveView(false);
         // Create the AprilTag processor.
         aprilTagProc = new AprilTagProcessor.Builder()
-                //.setLensIntrinsics(1516.76, 1516.76, 950.833, 533.379)
+                .setLensIntrinsics(677.192, 677.192, 311.844, 222.811)
                 .build();
         // Set and enable the processor.
         visionPortalBuilder.addProcessor(aprilTagProc);
@@ -339,16 +339,15 @@ public class Hardware2023 {
 
 
 
-     */
 
-    /*
+
     }
 
     public void disableTFOD (){
         visionPortal.setProcessorEnabled(tfod, false);
 
     }
-*/
+
 
     /**
      * This operation move robot forward/backward according to the input

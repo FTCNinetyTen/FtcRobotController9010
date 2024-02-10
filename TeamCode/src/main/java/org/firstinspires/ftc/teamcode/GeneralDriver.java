@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Log;
-
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
-import org.firstinspires.ftc.teamcode.hardware.MecanumWheels;
+import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2022;
 
 @TeleOp(name="GeneralDriver2022", group="TeleOps")
 
@@ -16,15 +13,15 @@ public class GeneralDriver extends LinearOpMode {
     private boolean debug = true;
     Hardware2022 hdw;
 
-    MecanumWheels robotWheel;
+    MecanumWheels2022 robotWheel;
 
     @Override
     public void runOpMode() throws InterruptedException {
         hdw = new Hardware2022(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
-        robotWheel = new MecanumWheels();
+        robotWheel = new MecanumWheels2022();
 
-        double powerDrivePercentage = 0.55;
+        double powerDrivePercentage = 0.75;
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();

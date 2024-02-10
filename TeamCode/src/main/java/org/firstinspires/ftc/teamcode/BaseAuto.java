@@ -29,7 +29,7 @@ public abstract class BaseAuto extends LinearOpMode {
     public void runOpMode() {
         hdw = new Hardware2023(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
-        //hdw.initVision();
+        hdw.initVision();
 
         waitForStart();
 
@@ -46,7 +46,7 @@ public abstract class BaseAuto extends LinearOpMode {
         Log.d("9010", "Detected: " + detectedPosition);
         telemetry.addData("[>]", "Detected:  " + detectedPosition);
         telemetry.update();
-        //hdw.disableTFOD();
+        hdw.disableTFOD();
 
         //2. Put purple pixel in place
         putPurplePixel();
@@ -59,7 +59,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
         hdw.resetPixelHook();
         //Park
-        //park();
+        park();
 
         idle();
     }

@@ -3,20 +3,18 @@ package org.firstinspires.ftc.teamcode;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 
-import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
-import org.firstinspires.ftc.teamcode.hardware.MecanumWheels;
+import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
 
 public class BaseGeneralDriver2023 extends LinearOpMode {
 
     private boolean debug = true;
     private Hardware2023 hdw;
-    private MecanumWheels robotWheel;
+    private MecanumWheels2023 robotWheel;
 
     String alliance ;
     String BLUE="Blue";
@@ -27,7 +25,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         hdw = new Hardware2023(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
-        robotWheel = new MecanumWheels();
+        robotWheel = new MecanumWheels2023();
 
         double powerDrivePercentage = 0.55;
 
