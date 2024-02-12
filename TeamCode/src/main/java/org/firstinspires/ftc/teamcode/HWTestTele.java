@@ -24,8 +24,8 @@ public class HWTestTele  extends LinearOpMode {
         telemetry.addData("[>]", "All set?");
         telemetry.update();
         //Initialize April Tag
-        //hdw.initVision();
-        //hdw.disableTFOD();
+        hdw.initVision();
+        hdw.disableTFOD();
 
 
         waitForStart();
@@ -73,14 +73,14 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveByAprilTag(4 , 14, -1);
+                hdw.moveByAprilTag(4 , 8, 0);
             }
 
             if ( gamepad1.b) {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveByAprilTag(5 , 18, 1);
+                hdw.moveByAprilTag(5 , 8, 0);
             }
 
             if( gamepad1.x) {

@@ -337,10 +337,6 @@ public class Hardware2023 {
 
         // end method initTfod()
 
-
-
-
-
     }
 
     public void disableTFOD (){
@@ -876,7 +872,7 @@ public class Hardware2023 {
         }
 */
         //Control 2 Vslide in Sync
-        if ((power > 0 && slidePosition < 2000) || (power < 0 && slidePosition > 0)) {
+        if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
             vSlideM.setVelocity(power * ANGULAR_RATE);
             vSlideS.setVelocity(power *ANGULAR_RATE );
         } else {

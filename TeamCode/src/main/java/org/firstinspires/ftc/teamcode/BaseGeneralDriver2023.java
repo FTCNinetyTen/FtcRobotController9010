@@ -27,7 +27,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
 
-        double powerDrivePercentage = 0.55;
+        double powerDrivePercentage = 0.75;
 
         telemetry.addData("[>]", "All set? For allience: " + alliance);
         telemetry.update();
