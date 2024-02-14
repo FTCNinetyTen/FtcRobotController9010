@@ -89,6 +89,8 @@ public class Hardware2023 {
 
     private double slideUpperLimit = 2000;
 
+    private double moveTimeOut = 3000;
+
     private boolean isBoxOpen = false;
     private boolean isDroneReleased = false;
     private boolean isPixHookUp = true;
@@ -414,7 +416,7 @@ public class Hardware2023 {
         long initMill = System.currentTimeMillis();
 
         while ( !(lnPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() )
-                && ( (System.currentTimeMillis() -initMill  )<4000)  ) {
+                && ( (System.currentTimeMillis() -initMill  )< moveTimeOut)  ) {
             currentPosition = yEncoder.getCurrentPosition();
             //Calculate new distance
             difference = currentPosition - targetPosition;
@@ -539,7 +541,7 @@ public class Hardware2023 {
         long initMill = System.currentTimeMillis();
 
         while ( ! (lnPidfCrtler.atSetPoint() && lnYPidfCrtler.atSetPoint())
-                && ( (System.currentTimeMillis() -initMill  )<5000) ) {
+                && ( (System.currentTimeMillis() -initMill  )< moveTimeOut) ) {
             currentPosition = xEncoder.getCurrentPosition();
             //Calculate new distance
             difference = currentPosition - targetPosition;

@@ -59,8 +59,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
         hdw.resetPixelHook();
         //Park
-        park();
-
+        //park();
         idle();
     }
 
@@ -77,7 +76,7 @@ public abstract class BaseAuto extends LinearOpMode {
             hdw.turn(-90);
 
             hdw.releasePixelHook();
-            sleep(500);
+
             //move forward , to avoid hiting the pixel
             hdw.moveYAxis(3,1);
 
@@ -118,7 +117,6 @@ public abstract class BaseAuto extends LinearOpMode {
 
             hdw.releasePixelHook();
             hdw.moveYAxis(1,1 );
-            sleep(500);
 
             //Turn facing Robot forward again.
             hdw.turn(180);
@@ -132,39 +130,36 @@ public abstract class BaseAuto extends LinearOpMode {
 
             if (targetTeamTP.equals(BLUETP) ) {
                 Log.d("9010", "move to april tag 1 ");
-                hdw.moveByAprilTag(1, 18, 0 );
+                hdw.moveByAprilTag(1, 6, 0 );
             } else {
                 Log.d("9010", "move to april tag 4 ");
-                hdw.moveByAprilTag(4, 18 , 0);
+                hdw.moveByAprilTag(4, 6 , 0);
             }
         } else  if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
 
             if (targetTeamTP.equals(BLUETP) ) {
                 Log.d("9010", "move to april tag 3 ");
-                hdw.moveByAprilTag(3, 18, 0 );
+                hdw.moveByAprilTag(3, 6, 0 );
             } else {
                 Log.d("9010", "move to april tag 6 ");
-                hdw.moveByAprilTag(6, 18 , 0);
+                hdw.moveByAprilTag(6, 6 , 0);
             }
 
         } else    if (detectedPosition.equals(TeamPropPosition.CENTER)) {
             if (targetTeamTP.equals(BLUETP) ) {
                 Log.d("9010", "move to april tag 2 ");
-                hdw.moveByAprilTag(2, 18, 0 );
+                hdw.moveByAprilTag(2, 6, 0 );
             } else {
                 Log.d("9010", "move to april tag 5 ");
-                hdw.moveByAprilTag(5, 18 , 0);
+                hdw.moveByAprilTag(5, 6 , 0);
             }
         }
 
-        hdw.moveYAxis(8,1);
-        hdw.moveYAxis(8,1);
-        hdw.moveYAxis(2,1);
+        hdw.moveYAxis(1,1);
         hdw.moveSlideToHeight(1500);
         hdw.openBox();
         sleep(1000);
         hdw.closeBox();
         hdw.moveSlideToHeight(100);
-
     }
 }

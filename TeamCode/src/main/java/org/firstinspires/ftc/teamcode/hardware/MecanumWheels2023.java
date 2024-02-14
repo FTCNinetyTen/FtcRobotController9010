@@ -47,12 +47,11 @@ public class MecanumWheels2023 {
         double x ,y ;
         if ( isHeadingForward ) {
             x  =  gamepad1.left_stick_x;
-            y  = -gamepad1.left_stick_y;
+            y  = gamepad1.left_stick_y;
         } else {
             x = - gamepad1.left_stick_x;
-            y =  gamepad1.left_stick_y;
+            y = - gamepad1.left_stick_y;
         }
-
         double rx = gamepad1.right_stick_x;
 
         wheelFrontLeftPower   = y - x  - rx ;
