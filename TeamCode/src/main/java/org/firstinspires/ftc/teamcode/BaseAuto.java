@@ -70,19 +70,21 @@ public abstract class BaseAuto extends LinearOpMode {
     private void putPurplePixel() {
 
         if (detectedPosition.equals(TeamPropPosition.LEFT) || detectedPosition.equals(TeamPropPosition.UNKOWN)) {
-            hdw.moveYAxis(25, 1);
+            hdw.moveYAxis(27, 1);
 
             //Turn right, as release is on the back of robot
             hdw.turn(-90);
+            hdw.moveYAxis(-1, 1);
 
             hdw.releasePixelHook();
+            sleep(500);
 
             //move forward , to avoid hiting the pixel
-            hdw.moveYAxis(3,1);
+            hdw.moveYAxis(5,1);
 
             //Turn Left , facing robot forward again.
             hdw.turn(90);
-
+            sleep(500);
         }
 
         if (detectedPosition.equals(TeamPropPosition.RIGHT)) {
@@ -99,27 +101,28 @@ public abstract class BaseAuto extends LinearOpMode {
 
             //Turn Right, facing Robot forward again.
             hdw.turn(-90);
-
+            sleep(500);
         }
         if (detectedPosition.equals(TeamPropPosition.CENTER)) {
             //Move more , to clear the team Prep
-            hdw.moveYAxis(32, 1);
+            hdw.moveYAxis(30, 1);
             //Then Move back for the turn
             hdw.moveYAxis(-5,-1);
 
             //Turn 2 90, to slow down.
             hdw.turn(90);
-            sleep(500);
+            sleep(450);
             hdw.turn(90);
 
-            sleep(1000);
-            hdw.moveYAxis(-2, -1);
-
             hdw.releasePixelHook();
-            hdw.moveYAxis(1,1 );
+            sleep(450);
 
+            hdw.moveYAxis(3,1 );
+
+            sleep(350);
             //Turn facing Robot forward again.
             hdw.turn(180);
+            sleep(350);
         }
 
         //hdw.moveSlideToHeight(0);
@@ -156,10 +159,12 @@ public abstract class BaseAuto extends LinearOpMode {
         }
 
         hdw.moveYAxis(1,1);
-        hdw.moveSlideToHeight(1500);
+        hdw.moveSlideToHeight(1300);
         hdw.openBox();
         sleep(1000);
         hdw.closeBox();
         hdw.moveSlideToHeight(100);
+
     }
+
 }

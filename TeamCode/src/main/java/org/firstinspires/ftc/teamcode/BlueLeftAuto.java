@@ -16,12 +16,16 @@ public class BlueLeftAuto extends BaseAuto {
         targetTeamTP="BlueTP";
     }
     void moveBeforeBoard() {
+
+        //MOve to left to avoid hitting trauss
+        hdw.moveXAxis(-2,-1);
+
         //Move Back for the drive before the board
         hdw.moveYAxis(-18,-1) ;
         //Move left
-        hdw.moveXAxis(-24,1) ;
+        hdw.moveXAxis(-26,1) ;
         //Move Forward,
-        hdw.moveYAxis(16, 1);
+        hdw.moveYAxis(18.5, 1);
         //Turn left
         hdw.turn(90);
     }

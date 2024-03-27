@@ -47,6 +47,7 @@ public class Hardware2023 {
     //servos
     public Servo boxGate = null;
     public Servo droneLauncher = null;
+    public Servo droneLauncher2 = null;
     public Servo pixelHook = null;
 
     //motors
@@ -256,9 +257,12 @@ public class Hardware2023 {
 
         boxGate = hwMap.get(Servo.class , "boxGate");
         droneLauncher = hwMap.get(Servo.class,"droneLauncher");
-        droneLauncher.setPosition(1);
+        droneLauncher.setPosition(0);
+        droneLauncher2 = hwMap.get(Servo.class, "droneLauncher2");
+        //droneLauncher2.setDirection(Servo.Direction.REVERSE);
+        droneLauncher2.setPosition(0.4);
         pixelHook = hwMap.get(Servo.class,"pixelHook");
-        pixelHook.setPosition(0);
+        pixelHook.setPosition(0.1);
 
     }
 
@@ -692,6 +696,7 @@ public class Hardware2023 {
      *                  means tag is on the right of robot camera.
      */
     public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  )  {
+        double yawOffset = 8.4;
         double cameraRadius = 6.875 ;
         //visionPortal.setProcessorEnabled(aprilTagProc,true);
         Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId );
@@ -736,7 +741,7 @@ public class Hardware2023 {
 
                     //1st We turn robot to make yaw 0
                     Log.d("9010","Before Turning to make Yaw 0");
-                    turn( initYaw);
+                    turn( initYaw - yawOffset);
                     Log.d("9010","Turn compelted. ");
                     //Componsate for the Y and X shift, becuase of turn
                     initX += cameraRadius * Math.sin( Math.toRadians(initYaw));
@@ -935,16 +940,20 @@ public class Hardware2023 {
     }
 
     public void releaseDroneLauncher() {
-        this.droneLauncher.setPosition(0);
+        this.droneLauncher.setPosition(1);
+        this.droneLauncher2.setPosition(0.7);
     }
 
     public void resetDroneLauncher() {
-        this.droneLauncher.setPosition(1);
+        this.droneLauncher.setPosition(0.1);
+        this.droneLauncher2.setPosition(0.4);
     }
+
+
 
     public void releasePixelHook ( ) {
         Log.d("9010", "Release Pix Hook");
-        this.pixelHook.setPosition(0.8);
+        this.pixelHook.setPosition(1);
     }
 
     public void resetPixelHook () {

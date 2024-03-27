@@ -149,11 +149,19 @@ public class HWTestTele  extends LinearOpMode {
 
             if (previousGamePad1.right_stick_button && !currentGamePad1.right_stick_button) {
                 hdw.closeBox();
+                hdw.releasePixelHook();
             }
             if (!previousGamePad1.right_stick_button && currentGamePad1.right_stick_button) {
                 hdw.openBox();
+                hdw.resetPixelHook();
             }
 
+            if (previousGamePad1.left_stick_button && !currentGamePad1.left_stick_button) {
+                //hdw.resetDroneLauncher();
+            }
+            if (!previousGamePad1.left_stick_button && currentGamePad1.left_stick_button) {
+                hdw.releaseDroneLauncher();
+            }
 
             //hdw.boxGate.setPosition(gamepad1.left_stick_x);
             //Log.d("9010", "Servo positon: " + gamepad1.left_stick_x);

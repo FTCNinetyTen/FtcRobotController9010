@@ -21,7 +21,7 @@ public class GeneralDriver extends LinearOpMode {
         hdw.createHardware();
         robotWheel = new MecanumWheels2022();
 
-        double powerDrivePercentage = 0.55;
+        double powerDrivePercentage = 0.60;
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();

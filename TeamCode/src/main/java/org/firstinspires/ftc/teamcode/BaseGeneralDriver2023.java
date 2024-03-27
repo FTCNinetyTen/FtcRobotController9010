@@ -27,7 +27,7 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
 
-        double powerDrivePercentage = 0.75;
+        double powerDrivePercentage = 0.85;
 
         telemetry.addData("[>]", "All set? For allience: " + alliance);
         telemetry.update();
@@ -115,15 +115,18 @@ public class BaseGeneralDriver2023 extends LinearOpMode {
                     hdw.releaseDroneLauncher();
                     hdw.setDroneReleased(false);
                 }
+
                 else {
                     hdw.resetDroneLauncher();
                     hdw.setDroneReleased(true);
                 }
             }
 
+            /*
             if ( !currentGamePad1.a &&  previousGamePad1.a  ) {
                hdw.moveSlideToHeight(1500);
             }
+             */
 
 
             telemetry.clearAll();
