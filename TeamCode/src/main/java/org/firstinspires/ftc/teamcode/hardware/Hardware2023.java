@@ -256,6 +256,7 @@ public class Hardware2023 {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         boxGate = hwMap.get(Servo.class , "boxGate");
+        boxGate.setPosition(0.3);
         droneLauncher = hwMap.get(Servo.class,"droneLauncher");
         droneLauncher.setPosition(0);
         droneLauncher2 = hwMap.get(Servo.class, "droneLauncher2");

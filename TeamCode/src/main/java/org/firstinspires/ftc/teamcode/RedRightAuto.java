@@ -22,9 +22,9 @@ public class RedRightAuto extends BaseAuto {
         //Move Back for the drive before the board
         hdw.moveYAxis(-18,-1) ;
         //Move Right
-        hdw.moveXAxis(18,1) ;
+        hdw.moveXAxis(24,1) ;
         //Move Forward,
-        hdw.moveYAxis(16, 1);
+        hdw.moveYAxis(18, 1);
         //Turn right
         hdw.turn(-90);
 

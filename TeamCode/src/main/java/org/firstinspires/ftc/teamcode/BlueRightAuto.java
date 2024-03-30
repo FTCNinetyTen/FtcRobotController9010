@@ -11,14 +11,17 @@ public class BlueRightAuto extends BaseAuto {
         targetTeamTP="BlueTP";
     }
     void moveBeforeBoard() {
+
+        hdw.moveXAxis(2,1);
         //Move Back for the drive before the board
-        hdw.moveYAxis(-24,-1) ;
+        hdw.moveYAxis(-18,-1) ;
         //Move Right
-        hdw.moveXAxis(-40,1) ;
+        hdw.moveXAxis(-60,-1) ;
         //Move Forward,
-        hdw.moveYAxis(24, 1);
-        //Turn left
+        hdw.moveYAxis(18, 1);
+        //Turn right
         hdw.turn(90);
+
     }
 
     void park ( ) {

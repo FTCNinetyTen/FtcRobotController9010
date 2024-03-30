@@ -115,14 +115,14 @@ public abstract class BaseAuto extends LinearOpMode {
             hdw.turn(90);
 
             hdw.releasePixelHook();
-            sleep(450);
+            sleep(550);
 
             hdw.moveYAxis(3,1 );
 
-            sleep(350);
+            sleep(450);
             //Turn facing Robot forward again.
             hdw.turn(180);
-            sleep(350);
+            sleep(450);
         }
 
         //hdw.moveSlideToHeight(0);
@@ -162,7 +162,6 @@ public abstract class BaseAuto extends LinearOpMode {
         hdw.moveSlideToHeight(1300);
         hdw.openBox();
         sleep(1000);
-        hdw.closeBox();
         hdw.moveSlideToHeight(100);
 
     }
