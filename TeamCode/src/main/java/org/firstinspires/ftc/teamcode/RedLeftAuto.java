@@ -17,15 +17,13 @@ public class RedLeftAuto extends BaseAuto {
 
     void moveBeforeBoard() {
         //MOve to left, to avoid hitting truss.
-        hdw.moveXAxis(-2,-1);
-
+        hdw.moveXAxis(2,1);
         //Move Back for the drive before the board
-        sleep(5000);
-        hdw.moveYAxis(-24,-1) ;
+        hdw.moveYAxis(-18,-1) ;
         //Move Right
         hdw.moveXAxis(72,1) ;
         //Move Forward,
-        hdw.moveYAxis(24, 1);
+        hdw.moveYAxis(18, 1);
         //Turn right
         hdw.turn(-90);
 
