@@ -29,13 +29,13 @@ public abstract class BaseAuto extends LinearOpMode {
     public void runOpMode() {
         hdw = new Hardware2023(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
-        hdw.initVision();
+        //hdw.initVision();
 
         waitForStart();
 
 
         //1. detect Team Prop
-
+/*
         try {
             detectedPosition = hdw.detectTeamProp(targetTeamTP);
         } catch (InterruptedException e) {
@@ -43,10 +43,11 @@ public abstract class BaseAuto extends LinearOpMode {
             detectedPosition = TeamPropPosition.UNKOWN;
 
         }
+  */
         Log.d("9010", "Detected: " + detectedPosition);
         telemetry.addData("[>]", "Detected:  " + detectedPosition);
         telemetry.update();
-        hdw.disableTFOD();
+        //hdw.disableTFOD();
 
         //2. Put purple pixel in place
         putPurplePixel();

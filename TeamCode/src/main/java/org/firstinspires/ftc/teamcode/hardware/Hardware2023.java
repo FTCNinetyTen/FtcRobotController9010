@@ -17,11 +17,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+//import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+//import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class Hardware2023 {
     public HardwareMap hwMap;
     private AprilTagProcessor aprilTagProc;
     private VisionPortal visionPortal;
-    private TfodProcessor tfod;
+    //private TfodProcessor tfod;
 
     private static final String TFOD_MODEL_ASSET = "9010_gear.tflite";
     private static final String[] LABELS = {
@@ -269,7 +269,7 @@ public class Hardware2023 {
 
     /**
      * Initialize the AprilTag processor.
-     */
+
 
     public void initVision () {
 
@@ -350,7 +350,7 @@ public class Hardware2023 {
         visionPortal.setProcessorEnabled(tfod, false);
 
     }
-
+     */
 
     /**
      * This operation move robot forward/backward according to the input
@@ -966,7 +966,7 @@ public class Hardware2023 {
      * This method detect the posiiton of Team Prop
      *
      * @return
-     */
+
     public TeamPropPosition detectTeamProp (String targetTeamProp ) throws InterruptedException {
         int left = 50;
         int center = 300;
@@ -1036,7 +1036,7 @@ public class Hardware2023 {
         }
 
         return foundPosition;
-    }
+    }      */
 
     public void spitOutPixel () {
         intake.setPower(-.8) ;
