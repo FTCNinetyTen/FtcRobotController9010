@@ -28,6 +28,8 @@ public class Hardware2024Fred {
     public DcMotorEx wheelFrontLeft = null;
     public DcMotorEx wheelBackRight = null;
     public DcMotorEx wheelBackLeft = null;
+    public DcMotorEx extend = null;
+    public DcMotorEx elevation = null;
 
     //IMU
     public IMU imu = null;
